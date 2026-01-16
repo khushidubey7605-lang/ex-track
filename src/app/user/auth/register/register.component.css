@@ -1,54 +1,56 @@
-.register-container {
-  width: 350px;
-  margin: 50px auto;
-  padding: 30px;
+/* Center the register form */
+form {
+  max-width: 450px;
+  margin: 60px auto;
+  padding: 35px;
   border: 1px solid #ddd;
-  border-radius: 10px;
-  background-color: #f9f9f9;
+  border-radius: 12px;
+  background-color: #fff7f0; /* Light orange for register */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.form-group {
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
+form div {
+  margin-bottom: 18px;
 }
 
 label {
+  display: block;
   margin-bottom: 5px;
+  font-weight: bold;
 }
 
 input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
 }
 
-.error {
-  color: red;
-  font-size: 12px;
-  margin-top: 5px;
+input:focus {
+  border-color: #f97316; /* Orange focus */
+  outline: none;
 }
 
 button {
   width: 100%;
-  padding: 10px;
-  background-color: #4CAF50;
-  border: none;
+  padding: 12px;
+  background-color: #f97316; /* Orange */
   color: white;
-  border-radius: 5px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #c2410c; /* Darker orange */
 }
 
-p {
-  text-align: center;
-  margin-top: 15px;
+.error {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 5px;
 }

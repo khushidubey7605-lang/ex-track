@@ -15,9 +15,8 @@ export class LoginComponent {
 
   submitted = false;
 
-  // ngModel bindings
-  email: string = '';
-  password: string = '';
+  email = '';
+  password = '';
 
   constructor(
     private auth: AuthService,
@@ -27,29 +26,42 @@ export class LoginComponent {
   async login(form: NgForm) {
     this.submitted = true;
 
-    if (!form.valid) {
-      return;
-    }
+    if (!form.valid) return;
 
     try {
-      await this.auth.login(this.email, this.password);
+      // 🔐 AuthService se login + role data
+      const userData = await this.auth.login(this.email, this.password);
 
-      alert('Login successful 🎉');
-      this.router.navigate(['/dashboard']);
+      // 🔁 ROLE BASED REDIRECT
+      if (userData.role === 'user') {
+        this.router.navigate(['/dashboard']);
+      }
+
+      else if (userData.role === 'admin') {
+        if (userData.status === 'active') {
+          this.router.navigate(['/admin-dashboard']);
+        } else {
+          alert('Admin approval pending!');
+        }
+      }
+
+      else if (userData.role === 'superadmin') {
+        this.router.navigate(['/superadmin-dashboard']);
+      }
 
     } catch (err: any) {
 
-      // ✅ User-friendly Firebase error handling
+      // ✅ Firebase friendly errors
       if (err.code === 'auth/user-not-found') {
         alert('User not found. Please signup first.');
       } else if (err.code === 'auth/wrong-password') {
-        alert('Incorrect password. Please try again.');
+        alert('Incorrect password.');
       } else if (err.code === 'auth/invalid-credential') {
         alert('Invalid email or password.');
       } else if (err.code === 'auth/too-many-requests') {
-        alert('Too many attempts. Please try again later.');
+        alert('Too many attempts. Try again later.');
       } else {
-        alert(err.message);
+        alert(err.message || 'Login failed');
       }
 
     }

@@ -9,35 +9,60 @@ import { AuthService } from '../../../services/auth.service';
   standalone: true,
   imports: [FormsModule, CommonModule, NgIf],
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']  
+  styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+
   submitted = false;
 
-  // ✅ Declare these properties for ngModel binding
+  // 🔹 ngModel bindings
   name = '';
   email = '';
+  role: 'user' | 'admin' | '' = '';
   password = '';
   confirmPassword = '';
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(
+    private auth: AuthService,
+    private router: Router
+  ) {}
 
   async register(form: NgForm) {
     this.submitted = true;
 
+    // ❌ Form invalid
     if (!form.valid) return;
 
+    // ❌ Password mismatch
     if (this.password !== this.confirmPassword) {
       alert('Passwords do not match!');
       return;
     }
 
     try {
-      await this.auth.register(this.name, this.email, this.password);
-      alert('Registered successfully!');
-      this.router.navigate(['/login']);
+      // 🔐 Firebase + Firestore register
+      await this.auth.register(
+        this.name,
+        this.email,
+        this.password,
+        this.role as 'user' | 'admin'
+      );
+
+      // ✅ Success handling
+      if (this.role === 'user') {
+        alert('User registered successfully!');
+        this.router.navigate(['/user-dashboard']);
+      } else {
+        alert('Admin registration submitted. Waiting for Super Admin approval.');
+        this.router.navigate(['/login']);
+      }
+
+      // 🔄 Reset form
+      form.resetForm();
+      this.submitted = false;
+
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message || 'Something went wrong');
     }
   }
 }

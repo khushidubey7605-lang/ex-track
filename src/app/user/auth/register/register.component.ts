@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -16,12 +16,13 @@ export class RegisterComponent {
 
   constructor(private auth: AuthService, private router: Router) {}
 
-  register() {
-    this.auth.register(this.email, this.password, this.name)
-      .then(() => {
-        alert('Registered Successfully');
-        this.router.navigate(['/login']);
-      })
-      .catch(err => alert(err.message));
+  async register() {
+    try {
+      await this.auth.register(this.name, this.email, this.password);
+      alert('Registered successfully!');
+      this.router.navigate(['/login']);
+    } catch (err: any) {
+      alert(err.message);
+    }
   }
 }

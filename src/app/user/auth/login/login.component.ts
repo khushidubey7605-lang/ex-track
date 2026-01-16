@@ -1,11 +1,26 @@
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [],
-  templateUrl: './login.html',
-  styleUrl: './login.css',
+  standalone: true,
+  imports: [FormsModule],
+  templateUrl: './login.component.html',
 })
-export class Login {
+export class LoginComponent {
+  email = '';
+  password = '';
 
+  constructor(private auth: AuthService, private router: Router) {}
+
+  async login() {
+    try {
+      await this.auth.login(this.email, this.password);
+      this.router.navigate(['/dashboard']);
+    } catch (err: any) {
+      alert(err.message);
+    }
+  }
 }

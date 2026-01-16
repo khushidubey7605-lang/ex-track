@@ -1,1 +1,8 @@
-<p>register works!</p>
+<h2>Register</h2>
+<input [(ngModel)]="name" placeholder="Name"><br>
+<input [(ngModel)]="email" placeholder="Email"><br>
+<input [(ngModel)]="password" type="password" placeholder="Password"><br>
+<button (click)="register()">Register</button>
+<p>
+  Already have an account? <a routerLink="/login">Login</a>
+</p>

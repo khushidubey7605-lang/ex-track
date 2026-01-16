@@ -1,0 +1,7 @@
+<h2>Login</h2>
+<div style="max-width: 300px; margin: auto;">
+  <input [(ngModel)]="email" placeholder="Email" style="width:100%; padding:8px; margin:5px 0;"><br>
+  <input [(ngModel)]="password" type="password" placeholder="Password" style="width:100%; padding:8px; margin:5px 0;"><br>
+  <button (click)="login()" style="width:100%; padding:8px; margin:10px 0;">Login</button>
+  <p style="text-align:center;">New user? <a routerLink="/register">Register</a></p>
+</div>

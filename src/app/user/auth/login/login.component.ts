@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
@@ -8,19 +8,29 @@ import { AuthService } from '../../../services/auth.service';
   standalone: true,
   imports: [FormsModule],
   templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   email = '';
   password = '';
+  submitted = false;
 
   constructor(private auth: AuthService, private router: Router) {}
 
-  async login() {
+  async login(form: NgForm) {
+    this.submitted = true;
+
+    if (!form.valid) {
+      alert('Please fill all required fields.');
+      return;
+    }
+
     try {
       await this.auth.login(this.email, this.password);
-      this.router.navigate(['/dashboard']);
+      alert('Login successful!');
+      this.router.navigate(['/dashboard']); // redirect after login
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message || 'Login failed.');
     }
   }
 }

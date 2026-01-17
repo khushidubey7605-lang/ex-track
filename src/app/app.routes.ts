@@ -8,18 +8,17 @@ import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard
 import { SuperadminDashboardComponent } from './admin/superadmin-dashboard/superadmin-dashboard.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  // ✅ Default → Register
+  { path: '', redirectTo: 'register', pathMatch: 'full' },
 
-  { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'login', component: LoginComponent },
 
-  // User Dashboard
+  // Dashboards
   { path: 'dashboard', component: DashboardComponent },
-
-  // Admin Dashboards
   { path: 'admin-dashboard', component: AdminDashboardComponent },
   { path: 'superadmin-dashboard', component: SuperadminDashboardComponent },
 
   // Fallback
-  { path: '**', redirectTo: 'login' }
+  { path: '**', redirectTo: 'register' }
 ];

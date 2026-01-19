@@ -1,29 +1,98 @@
-.navbar {
+/* ======== Wrapper ======== */
+.sidenav-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #1976d2;
-  padding: 1rem 2rem;
-  color: white;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2); /* match register background */
 }
 
-.navbar-logo h1 {
-  margin: 0;
-  font-size: 1.5rem;
+/* ======== Sidebar ======== */
+.sidenav {
+  width: 250px;
+  background: #ffb74d; /* warm orange */
+  color: #3e2723; /* dark brown */
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1rem;
+  border-radius: 0 20px 20px 0;
+  box-shadow: 4px 0 12px rgba(0,0,0,0.1);
+  transition: width 0.3s;
 }
 
-.navbar-links {
+/* ======== Sidebar Logo ======== */
+.sidenav-logo h1 {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  color: #3e2723;
+  text-align: center;
+}
+
+/* ======== Links ======== */
+.sidenav-links {
   list-style: none;
-  display: flex;
-  gap: 1.5rem;
+  padding: 0;
+  margin: 0;
+  flex: 1;
 }
 
-.navbar-links li a {
-  color: white;
+.sidenav-links li {
+  margin-bottom: 1rem;
+}
+
+.sidenav-links a {
+  display: block;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
   text-decoration: none;
-  font-weight: 500;
+  color: #3e2723;
+  font-weight: 600;
+  transition: background 0.3s, color 0.3s;
 }
 
-.navbar-links li a.active {
-  border-bottom: 2px solid #ffeb3b;
+.sidenav-links a:hover,
+.sidenav-links a.active {
+  background: #ff8f00; /* darker orange hover */
+  color: #fff8e1; /* light text on hover */
+}
+
+/* ======== Main Content ======== */
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  background: #fff8e1; /* light cream background */
+}
+
+/* ======== Responsive ======== */
+@media (max-width: 900px) {
+  .sidenav {
+    width: 100%;
+    flex-direction: row;
+    border-radius: 0 0 20px 20px;
+    padding: 1rem;
+  }
+
+  .sidenav-logo h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0;
+    flex: 1;
+    text-align: left;
+  }
+
+  .sidenav-links {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .sidenav-links li {
+    margin-bottom: 0;
+  }
+
+  .sidenav-links a {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
 }

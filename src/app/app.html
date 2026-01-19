@@ -1,5 +1,5 @@
-<!-- Navbar shown conditionally -->
-<app-navbar *ngIf="showNavbar"></app-navbar>
+<!-- Show navbar only if showNavbar is true -->
+<app-navbar *ngIf="showNavbar" [username]="username"></app-navbar>
 
-<!-- Routed components will appear here -->
+<!-- Main content -->
 <router-outlet></router-outlet>

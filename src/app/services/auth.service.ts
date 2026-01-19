@@ -6,7 +6,6 @@ import {
   signOut,
   UserCredential
 } from '@angular/fire/auth';
-
 import {
   Firestore,
   doc,
@@ -17,13 +16,10 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private currentUser: { name: string; role: string; uid: string } | null = null;
 
-  constructor(
-    private auth: Auth,
-    private firestore: Firestore
-  ) {}
+  constructor(private auth: Auth, private firestore: Firestore) {}
 
-  // 🔐 REGISTER (User / Admin)
   async register(
     name: string,
     email: string,
@@ -31,15 +27,11 @@ export class AuthService {
     role: 'user' | 'admin',
     extraData?: { phone?: string; city?: string; gender?: string }
   ): Promise<UserCredential> {
-
-    // ✅ Create account in Firebase Auth
     const res = await createUserWithEmailAndPassword(this.auth, email, password);
     const uid = res.user.uid;
 
-    // ✅ Admin → pending | User → active
     const status = role === 'admin' ? 'pending' : 'active';
 
-    // ✅ Save user info in Firestore
     await setDoc(doc(this.firestore, 'users', uid), {
       uid,
       name,
@@ -49,19 +41,17 @@ export class AuthService {
       phone: extraData?.phone || '',
       city: extraData?.city || '',
       gender: extraData?.gender || '',
-      createdAt: serverTimestamp() // ✅ Firestore server timestamp
+      createdAt: serverTimestamp()
     });
 
-    return res; // ✅ Return UserCredential so component can access user.uid
+    return res;
   }
 
-  // 🔑 LOGIN (Role + Status check)
   async login(email: string, password: string): Promise<any> {
     const res = await signInWithEmailAndPassword(this.auth, email, password);
     const uid = res.user.uid;
 
     const userSnap = await getDoc(doc(this.firestore, 'users', uid));
-
     if (!userSnap.exists()) {
       await signOut(this.auth);
       throw new Error('User data not found');
@@ -69,17 +59,30 @@ export class AuthService {
 
     const userData: any = userSnap.data();
 
-    // ❌ Admin pending → block login
     if (userData.role === 'admin' && userData.status !== 'active') {
       await signOut(this.auth);
       throw new Error('Admin approval pending');
     }
 
-    return userData; // 👈 role & info components ko milega
+    this.currentUser = {
+      name: userData.name,
+      role: userData.role,
+      uid: userData.uid
+    };
+
+    return userData;
   }
 
-  // 🚪 LOGOUT
-  logout() {
-    return signOut(this.auth);
+  async logout() {
+    await signOut(this.auth);
+    this.currentUser = null;
+  }
+
+  getUsername(): string | null {
+    return this.currentUser ? this.currentUser.name : null;
+  }
+
+  getCurrentUser(): { name: string; role: string; uid: string } | null {
+    return this.currentUser;
   }
 }

@@ -1,55 +1,35 @@
-// import { Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 
+// Auth Components
 import { LoginComponent } from './user/auth/login/login.component';
 import { RegisterComponent } from './user/auth/register/register.component';
 
+// User Components
 import { DashboardComponent } from './user/dashboard/dashboard.component';
-import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
-import { SuperadminDashboardComponent } from './admin/superadmin-dashboard/superadmin-dashboard.component';
-import { Routes } from '@angular/router';
+import { Expenses } from './user/expenses/expenses/expenses';
+import { Profile } from './user/profile/profile/profile';
 
-// import { NavbarLayoutComponent } from './layout/navbar-layout/navbar-layout.component';
+// Layout Components
+import { NavbarComponent } from './core/layout/navbar.component/navbar.component'; // check exact path
 
 export const routes: Routes = [
 
-  // ====== AUTH ROUTES (No Sidebar) ======
+  // ===== AUTH (NO NAVBAR) =====
   { path: '', redirectTo: 'register', pathMatch: 'full' },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
 
-  // ====== DASHBOARD ROUTES (WITH SIDEBAR) ======
+  // ===== USER PAGES (WITH NAVBAR) =====
   {
     path: '',
-    // component: NavbarLayoutComponent,   // <-- IMPORTANT
+    component: NavbarComponent,
     children: [
       { path: 'dashboard', component: DashboardComponent },
-      { path: 'admin-dashboard', component: AdminDashboardComponent },
-      { path: 'superadmin-dashboard', component: SuperadminDashboardComponent },
+      { path: 'expenses', component: Expenses },
+      { path: 'profile', component: Profile },
     ]
   },
 
-  // Fallback
+  // ===== WILDCARD =====
   { path: '**', redirectTo: 'register' }
 ];
-// import { Routes } from '@angular/router';
-
-// import { LoginComponent } from './user/auth/login/login.component';
-// import { RegisterComponent } from './user/auth/register/register.component';
-
-// import { DashboardComponent } from './user/dashboard/dashboard.component';
-// import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
-// import { SuperadminDashboardComponent } from './admin/superadmin-dashboard/superadmin-dashboard.component';
-
-// export const routes: Routes = [
-
-//   { path: '', redirectTo: 'register', pathMatch: 'full' },
-
-//   { path: 'register', component: RegisterComponent },
-//   { path: 'login', component: LoginComponent },
-
-//   { path: 'dashboard', component: DashboardComponent },
-//   { path: 'admin-dashboard', component: AdminDashboardComponent },
-//   { path: 'superadmin-dashboard', component: SuperadminDashboardComponent },
-
-//   { path: '**', redirectTo: 'register' }
-// ];

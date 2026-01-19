@@ -13,49 +13,46 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class RegisterComponent {
 
-  submitted = false;
-
   name = '';
+  gender = '';
   email = '';
+  phone = '';
+  city = '';
   role: 'user' | 'admin' | '' = '';
   password = '';
   confirmPassword = '';
 
   constructor(
-    private auth: AuthService,
+    private auth: AuthService, 
     private router: Router
   ) {}
 
   async register(form: NgForm) {
-    this.submitted = true;
-
     if (!form.valid) return;
 
     if (this.password !== this.confirmPassword) {
+      alert("Passwords do not match");
       return;
     }
 
     try {
-      await this.auth.register(
+      // ✅ Register user with extraData
+      const userCredential = await this.auth.register(
         this.name,
         this.email,
         this.password,
-        this.role as 'user' | 'admin'
+        this.role as 'user' | 'admin',
+        {
+          phone: this.phone,
+          city: this.city,
+          gender: this.gender
+        }
       );
 
-      if (this.role === 'user') {
-        alert('User registered successfully!');
-        this.router.navigate(['/dashboard']);
-      } else {
-        alert('Admin request sent for approval!');
-        this.router.navigate(['/login']);
-      }
-
-      form.resetForm();
-      this.submitted = false;
-
+      alert('Registered Successfully');
+      this.router.navigate(['/login']);
     } catch (err: any) {
-      alert(err.message || 'Registration failed');
+      alert(err.message);
     }
   }
 }

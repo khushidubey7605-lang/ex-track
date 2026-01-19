@@ -14,7 +14,6 @@ import { AuthService } from '../../../services/auth.service';
 export class LoginComponent {
 
   submitted = false;
-
   email = '';
   password = '';
 
@@ -29,29 +28,23 @@ export class LoginComponent {
     if (!form.valid) return;
 
     try {
-      // 🔐 AuthService se login + role data
       const userData = await this.auth.login(this.email, this.password);
 
-      // 🔁 ROLE BASED REDIRECT
+      // Role-based redirect
       if (userData.role === 'user') {
         this.router.navigate(['/dashboard']);
-      }
-
-      else if (userData.role === 'admin') {
+      } else if (userData.role === 'admin') {
         if (userData.status === 'active') {
           this.router.navigate(['/admin-dashboard']);
         } else {
           alert('Admin approval pending!');
         }
-      }
-
-      else if (userData.role === 'superadmin') {
+      } else if (userData.role === 'superadmin') {
         this.router.navigate(['/superadmin-dashboard']);
       }
 
     } catch (err: any) {
-
-      // ✅ Firebase friendly errors
+      // Firebase friendly errors
       if (err.code === 'auth/user-not-found') {
         alert('User not found. Please signup first.');
       } else if (err.code === 'auth/wrong-password') {
@@ -63,7 +56,6 @@ export class LoginComponent {
       } else {
         alert(err.message || 'Login failed');
       }
-
     }
   }
 }

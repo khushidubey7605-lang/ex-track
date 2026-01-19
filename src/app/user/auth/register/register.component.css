@@ -1,129 +1,152 @@
-/* 🌈 Full Page Gradient Background */
-:host {
-  display: block;
+/* ======== Wrapper ======== */
+.register-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-  padding-top: 40px;
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2); /* light warm gradient (cream → light orange) */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 2rem;
+  box-sizing: border-box;
 }
 
-/* 💳 Register Card */
-.register-container {
-  width: 390px;
-  margin: auto;
-  padding: 32px 28px;
+/* ======== Card ======== */
+.form-section {
+  display: flex;
+  width: 850px;
+  max-width: 95%;
   border-radius: 20px;
-  background: linear-gradient(180deg, #ffffff, #f1f8ff);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-  border-top: 6px solid #00c896;
-  animation: slideUp 0.6s ease;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); /* soft shadow */
+  background: #ffffff;
 }
 
-/* ✨ Animation */
-@keyframes slideUp {
-  from {
-    transform: translateY(25px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-/* 🟢 Heading */
-.register-container h2 {
-  text-align: center;
-  color: #0f4c75;
-  margin-bottom: 20px;
-  font-size: 26px;
-  font-weight: 700;
-}
-
-/* 📦 Form Groups */
-.form-group {
+/* ======== Left Panel ======== */
+.form-section .welcome-panel {
+  flex: 1;
+  background: #ffb74d; /* warm orange */
+  color: #3e2723; /* dark brown text for contrast */
+  padding: 3rem 2rem;
   display: flex;
   flex-direction: column;
-  margin-bottom: 14px;
+  justify-content: center;
+  border-right: 1px solid #ffcc80;
 }
 
-/* 🏷 Labels */
-label {
-  font-size: 13px;
-  color: #1b262c;
-  font-weight: 600;
-  margin-bottom: 4px;
+.form-section .welcome-panel h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
 }
 
-/* ✍ Inputs */
-input, select {
-  padding: 11px 12px;
-  border-radius: 10px;
-  border: 1.5px solid #b8d8ff;
-  background: #f7fbff;
-  font-size: 14px;
-  transition: 0.3s;
+.form-section .welcome-panel p {
+  margin-bottom: 2rem;
+  line-height: 1.5;
 }
 
-input:focus, select:focus {
-  border-color: #00c896;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.3);
-  outline: none;
-}
-
-/* ❗ Errors */
-.error {
-  font-size: 12px;
-  color: #e63946;
-  margin-top: 3px;
-}
-
-/* 🚀 Register Button */
-button {
-  margin-top: 16px;
-  padding: 12px;
-  border: none;
-  border-radius: 30px;
-  background: linear-gradient(135deg, #00c896, #00a8cc);
-  color: white;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
+.form-section .welcome-panel button {
+  padding: 0.8rem 2rem;
+  border: 2px solid #3e2723;
+  background: transparent;
+  color: #3e2723;
+  border-radius: 8px;
   cursor: pointer;
-  transition: 0.3s;
+  font-weight: 600;
+  transition: background 0.3s, color 0.3s;
 }
 
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(0, 168, 204, 0.55);
+.form-section .welcome-panel button:hover {
+  background: #3e2723;
+  color: #ffb74d;
 }
 
-/* 🔗 Login Text */
-p {
+/* ======== Right Panel (Form) ======== */
+.form-section .form-panel {
+  flex: 1.2;
+  padding: 3rem 2rem;
+}
+
+.form-section .form-panel h2 {
   text-align: center;
-  margin-top: 18px;
-  font-size: 13px;
-  color: #e0f2ff;
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  color: #bf360c; /* dark red heading */
 }
 
-.register-container p {
-  color: #1b262c;
+/* ======== Form Rows ======== */
+.form-section .form-panel .row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-a {
-  color: #00a8cc;
-  font-weight: 700;
+.form-section .form-panel .row input,
+.form-section .form-panel .row select {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ffcc80; /* light orange border */
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+  background: #fff8e1; /* very light yellow background */
+}
+
+.form-section .form-panel .row input:focus,
+.form-section .form-panel .row select:focus {
+  border-color: #ff8f00; /* darker orange on focus */
+  box-shadow: 0 0 8px rgba(255, 143, 0, 0.2);
+}
+
+/* ======== Submit Button ======== */
+.form-section .form-panel button {
+  width: 100%;
+  padding: 0.9rem;
+  background: #ffcc80; /* light orange button */
+  color: #3e2723; /* dark text for contrast */
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 0.5rem;
+}
+
+.form-section .form-panel button:hover {
+  background: #ff8f00; /* darker orange on hover */
+}
+
+/* ======== Login Link ======== */
+.form-section .form-panel .login-link {
+  text-align: center;
+  margin-top: 1rem;
+  color: #6d4c41; /* dark brown text */
+  font-size: 0.95rem;
+}
+
+.form-section .form-panel .login-link a {
+  color: #ff6f00; /* bright orange link */
+  font-weight: 600;
   text-decoration: none;
 }
 
-a:hover {
+.form-section .form-panel .login-link a:hover {
   text-decoration: underline;
 }
 
-/* 📱 Mobile Responsive */
-@media (max-width: 420px) {
-  .register-container {
-    width: 92%;
-    padding: 24px;
+/* ======== Responsive ======== */
+@media (max-width: 900px) {
+  .form-section {
+    flex-direction: column;
+  }
+
+  .form-section .welcome-panel {
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .form-section .form-panel .row {
+    flex-direction: column;
   }
 }

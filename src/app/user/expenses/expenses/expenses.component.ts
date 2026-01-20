@@ -6,7 +6,8 @@ import { CommonModule } from '@angular/common';
 @Component({
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './expenses.component.html'
+  templateUrl: './expenses.component.html',
+  styleUrls: ['./expenses.component.css']
 })
 export class ExpensesComponent {
 

@@ -1,0 +1,86 @@
+/* Center wrapper */
+.expense-wrapper {
+  padding: 2rem;
+}
+
+/* Card */
+.expense-card {
+  max-width: 800px;
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+/* Title */
+.expense-card h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+/* Form layout */
+.expense-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+/* Full width button */
+.expense-form button {
+  grid-column: span 2;
+}
+
+/* Group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Label */
+.form-group label {
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #555;
+}
+
+/* Input */
+.form-group input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  font-size: 14px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #ff9800;
+  box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
+}
+
+/* Button */
+.save-btn {
+  margin-top: 1rem;
+  padding: 12px;
+  background: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-btn:hover {
+  background: #fb8c00;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .expense-form {
+    grid-template-columns: 1fr;
+  }
+
+  .expense-form button {
+    grid-column: span 1;
+  }
+}

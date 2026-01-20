@@ -1,8 +1,31 @@
-<h2>Add Expense</h2>
+<div class="expense-wrapper">
+  <div class="expense-card">
+    <h2>Add Expense</h2>
 
-<input placeholder="Title" [(ngModel)]="data.title">
-<input type="number" placeholder="Amount" [(ngModel)]="data.amount">
-<input placeholder="Category" [(ngModel)]="data.category">
-<input type="date" [(ngModel)]="data.date">
+    <form class="expense-form">
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" [(ngModel)]="data.title" name="title">
+      </div>
 
-<button (click)="save()">Save</button>
+      <div class="form-group">
+        <label>Amount</label>
+        <input type="number" [(ngModel)]="data.amount" name="amount">
+      </div>
+
+      <div class="form-group">
+        <label>Category</label>
+        <input type="text" [(ngModel)]="data.category" name="category">
+      </div>
+
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" [(ngModel)]="data.date" name="date">
+      </div>
+
+      <button type="button" class="save-btn" (click)="save()">
+        Save Expense
+      </button>
+    </form>
+  </div>
+</div>

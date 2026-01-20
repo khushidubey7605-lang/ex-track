@@ -2,8 +2,11 @@ export interface Transaction {
   id?: string;
   title: string;
   amount: number;
-  type: 'income' | 'expense';
   category: string;
-  date: any;
-  userId: string;
+  type: 'income' | 'expense';
+  date: string;
+  month: number;
+  year: number;
+  uid: string;
+  createdAt?: any;
 }

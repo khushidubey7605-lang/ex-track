@@ -3,17 +3,30 @@
   <nav class="sidenav">
     <div class="sidenav-logo">
       <h1>ExpenseTracker</h1>
+      <p *ngIf="username">Welcome, {{ username }}</p>
     </div>
+
     <ul class="sidenav-links">
-      <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
-      <li><a routerLink="/expenses" routerLinkActive="active">Expenses</a></li>
-      <li><a routerLink="/reports" routerLinkActive="active">Reports</a></li>
-      <li><a routerLink="/profile" routerLinkActive="active">Profile</a></li>
+      <li>
+        <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      </li>
+      <li>
+        <a routerLink="/expenses" routerLinkActive="active">Expenses</a>
+      </li>
+      <li>
+        <a routerLink="/income" routerLinkActive="active">Income</a>
+      </li>
+      <li>
+        <a routerLink="/reports" routerLinkActive="active">Reports</a>
+      </li>
+      <li>
+        <a routerLink="/profile" routerLinkActive="active">Profile</a>
+      </li>
     </ul>
   </nav>
 
   <!-- Main content -->
   <div class="main-content">
-    <!-- <router-outlet></router-outlet> -->
+    <router-outlet></router-outlet> <!-- required for routing -->
   </div>
 </div>

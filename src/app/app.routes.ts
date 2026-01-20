@@ -7,10 +7,12 @@ import { RegisterComponent } from './user/auth/register/register.component';
 // User Components
 import { DashboardComponent } from './user/dashboard/dashboard.component';
 import { ExpensesComponent } from './user/expenses/expenses/expenses.component';
-import { ProfileComponent } from './user/profile/profile/profile';
+import { ProfileComponent } from './user/profile/profile/profile.component';
 
 // Layout Components
-import { NavbarComponent } from './core/layout/navbar/navbar.component';
+// ✅ correct (folder name ke according)
+import { NavbarComponent } from './core/layout/navbar.component/navbar.component';
+
 
 export const routes: Routes = [
   // ===== AUTH (NO NAVBAR) =====

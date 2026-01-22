@@ -11,11 +11,13 @@ export class ExpenseService {
     private auth: AuthService
   ) {}
 
+  // ✅ already working — keep same
   async addTransaction(data: Transaction) {
     const ref = collection(this.firestore, 'transactions');
     return await addDoc(ref, data);
   }
 
+  // ✅ already working — keep same
   async getByMonthYear(type: 'income' | 'expense', month: number, year: number) {
     const uid = this.auth.getCurrentUser()?.uid!;
     const ref = collection(this.firestore, 'transactions');
@@ -26,6 +28,23 @@ export class ExpenseService {
       where('type', '==', type),
       where('month', '==', month),
       where('year', '==', year)
+    );
+
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+
+  // ✅ NEW — for showing all expenses
+  async getAllExpenses() {
+    const uid = this.auth.getCurrentUser()?.uid;
+    if (!uid) return [];
+
+    const ref = collection(this.firestore, 'transactions');
+
+    const q = query(
+      ref,
+      where('uid', '==', uid),
+      where('type', '==', 'expense')
     );
 
     const snap = await getDocs(q);

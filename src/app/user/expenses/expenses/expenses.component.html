@@ -27,5 +27,26 @@
         Save Expense
       </button>
     </form>
+
+    <hr>
+
+    <h3>Your Expenses</h3>
+
+    <div *ngIf="expenses.length > 0; else noData">
+
+      <div class="expense-item" *ngFor="let e of expenses">
+        <div>
+          <b>{{ e.title }}</b>
+          <p>{{ e.category }} | {{ e.date }}</p>
+        </div>
+        <div class="amount">₹ {{ e.amount }}</div>
+      </div>
+
+    </div>
+
+    <ng-template #noData>
+      <p class="no-expense">No expenses added yet</p>
+    </ng-template>
+<h1>its khushi</h1>
   </div>
 </div>

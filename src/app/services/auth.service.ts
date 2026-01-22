@@ -4,7 +4,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  UserCredential
+  User,
+  onAuthStateChanged
 } from '@angular/fire/auth';
 import {
   Firestore,
@@ -16,9 +17,32 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+
   private currentUser: { name: string; role: string; uid: string } | null = null;
 
-  constructor(private auth: Auth, private firestore: Firestore) {}
+  constructor(private auth: Auth, private firestore: Firestore) {
+
+    // ✅ Auto restore user after refresh
+    onAuthStateChanged(this.auth, async (user: User | null) => {
+      if (user) {
+        const snap = await getDoc(doc(this.firestore, 'users', user.uid));
+        if (snap.exists()) {
+          const d: any = snap.data();
+          this.currentUser = {
+            name: d.name,
+            role: d.role,
+            uid: d.uid
+          };
+          console.log('User restored 👉', this.currentUser);
+        }
+      } else {
+        this.currentUser = null;
+      }
+    });
+
+  }
+
+  // ---------------- REGISTER ----------------
 
   async register(
     name: string,
@@ -26,7 +50,7 @@ export class AuthService {
     password: string,
     role: 'user' | 'admin',
     extraData?: { phone?: string; city?: string; gender?: string }
-  ): Promise<UserCredential> {
+  ) {
     const res = await createUserWithEmailAndPassword(this.auth, email, password);
     const uid = res.user.uid;
 
@@ -47,7 +71,9 @@ export class AuthService {
     return res;
   }
 
-  async login(email: string, password: string): Promise<any> {
+  // ---------------- LOGIN ----------------
+
+  async login(email: string, password: string) {
     const res = await signInWithEmailAndPassword(this.auth, email, password);
     const uid = res.user.uid;
 
@@ -73,16 +99,20 @@ export class AuthService {
     return userData;
   }
 
+  // ---------------- LOGOUT ----------------
+
   async logout() {
     await signOut(this.auth);
     this.currentUser = null;
   }
 
+  // ---------------- HELPERS ----------------
+
   getUsername(): string | null {
     return this.currentUser ? this.currentUser.name : null;
   }
 
-  getCurrentUser(): { name: string; role: string; uid: string } | null {
+  getCurrentUser() {
     return this.currentUser;
   }
 }

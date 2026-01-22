@@ -1,53 +1,37 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, addDoc, query, where, getDocs } from '@angular/fire/firestore';
 import { AuthService } from './auth.service';
-import { Transaction } from '../models/transaction.model';
+
+export interface Expense {
+  id?: string;
+  title: string;
+  amount: number;
+  category: string;
+  date: string;
+  month: number;
+  year: number;
+  userId: string;
+  type?: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class ExpenseService {
 
-  constructor(
-    private firestore: Firestore,
-    private auth: AuthService
-  ) {}
+  constructor(private firestore: Firestore, private auth: AuthService) {}
 
-  // ✅ already working — keep same
-  async addTransaction(data: Transaction) {
-    const ref = collection(this.firestore, 'transactions');
+  async addTransaction(data: Expense) {
+    const ref = collection(this.firestore, 'expenses');
     return await addDoc(ref, data);
   }
 
-  // ✅ already working — keep same
-  async getByMonthYear(type: 'income' | 'expense', month: number, year: number) {
-    const uid = this.auth.getCurrentUser()?.uid!;
-    const ref = collection(this.firestore, 'transactions');
-
-    const q = query(
-      ref,
-      where('uid', '==', uid),
-      where('type', '==', type),
-      where('month', '==', month),
-      where('year', '==', year)
-    );
-
-    const snap = await getDocs(q);
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  }
-
-  // ✅ NEW — for showing all expenses
-  async getAllExpenses() {
+  async getAllExpenses(): Promise<Expense[]> {
     const uid = this.auth.getCurrentUser()?.uid;
     if (!uid) return [];
 
-    const ref = collection(this.firestore, 'transactions');
-
-    const q = query(
-      ref,
-      where('uid', '==', uid),
-      where('type', '==', 'expense')
-    );
-
+    const ref = collection(this.firestore, 'expenses');
+    const q = query(ref, where('userId', '==', uid));
     const snap = await getDocs(q);
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    return snap.docs.map(d => ({ id: d.id, ...(d.data() as Expense) }));
   }
 }
+    

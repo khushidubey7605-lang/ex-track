@@ -1,52 +1,70 @@
 <div class="expense-wrapper">
-  <div class="expense-card">
-    <h2>Add Expense</h2>
 
-    <form class="expense-form">
+  <div class="expense-card">
+
+    <!-- Form Title -->
+    <h2>{{ editingId ? 'Edit Expense' : 'Add Expense' }}</h2>
+
+    <!-- Expense Form -->
+    <form class="expense-form" (ngSubmit)="save()">
+
       <div class="form-group">
         <label>Title</label>
-        <input type="text" [(ngModel)]="data.title" name="title">
+        <input type="text" [(ngModel)]="data.title" name="title" placeholder="Eg: Grocery" required>
       </div>
 
       <div class="form-group">
         <label>Amount</label>
-        <input type="number" [(ngModel)]="data.amount" name="amount">
+        <input type="number" [(ngModel)]="data.amount" name="amount" placeholder="Eg: 500" required>
       </div>
 
       <div class="form-group">
         <label>Category</label>
-        <input type="text" [(ngModel)]="data.category" name="category">
+        <input type="text" [(ngModel)]="data.category" name="category" placeholder="Food / Travel" required>
       </div>
 
       <div class="form-group">
         <label>Date</label>
-        <input type="date" [(ngModel)]="data.date" name="date">
+        <input type="date" [(ngModel)]="data.date" name="date" required>
       </div>
 
-      <button type="button" class="save-btn" (click)="save()">
-        Save Expense
+      <button class="save-btn" type="submit">
+        {{ editingId ? 'Update Expense' : 'Add Expense' }}
       </button>
+
     </form>
 
     <hr>
 
-    <h3>Your Expenses</h3>
+    <!-- Expense List Title -->
+    <h3>Expense List</h3>
 
-    <div *ngIf="expenses.length > 0; else noData">
+    <!-- Expense List -->
+    <div class="expense-list" *ngIf="expenses.length > 0; else noData">
 
       <div class="expense-item" *ngFor="let e of expenses">
-        <div>
+
+        <div class="expense-left">
           <b>{{ e.title }}</b>
-          <p>{{ e.category }} | {{ e.date }}</p>
+          <p>{{ e.category }} • {{ e.date }}</p>
         </div>
-        <div class="amount">₹ {{ e.amount }}</div>
+
+        <div class="expense-right">
+          <div class="amount">₹{{ e.amount }}</div>
+          <div class="action-buttons">
+            <button class="edit-btn" (click)="edit(e)">Edit</button>
+            <button class="delete-btn" (click)="delete(e.id!)">Delete</button>
+          </div>
+        </div>
+
       </div>
 
     </div>
 
     <ng-template #noData>
-      <p class="no-expense">No expenses added yet</p>
+      <div class="no-expense">No expenses added yet</div>
     </ng-template>
 
   </div>
+
 </div>

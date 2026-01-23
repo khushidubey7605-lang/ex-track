@@ -1,0 +1,46 @@
+<div class="income-panel">
+  <h2>Add Income</h2>
+  <form (ngSubmit)="save()" #incomeForm="ngForm" class="income-form">
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" [(ngModel)]="data.title" placeholder="Eg: Salary" required>
+      </div>
+
+      <div class="form-group">
+        <label for="amount">Amount</label>
+        <input type="number" id="amount" name="amount" [(ngModel)]="data.amount" placeholder="Eg: 5000" required>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="category">Category</label>
+        <input type="text" id="category" name="category" [(ngModel)]="data.category" placeholder="Eg: Freelance / Salary" required>
+      </div>
+
+      <div class="form-group">
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" [(ngModel)]="data.date" required>
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="!incomeForm.form.valid">Add Income</button>
+  </form>
+
+  <h3>Income List</h3>
+  <div class="income-list">
+    <div class="income-item" *ngFor="let item of incomeList">
+      <div>
+        <strong>{{ item.title }}</strong><br>
+        <small>{{ item.category }} • {{ item.date }}</small>
+      </div>
+      <div class="income-actions">
+        <span class="income-amount">₹{{ item.amount }}</span>
+        <button class="edit-btn" (click)="editIncome(item)">Edit</button>
+        <button class="delete-btn" (click)="deleteIncome(item)">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

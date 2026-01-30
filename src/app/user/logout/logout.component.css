@@ -1,0 +1,39 @@
+.logout-page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff3e0;
+}
+
+.logout-card {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 14px;
+  width: 360px;
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+.actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn.cancel {
+  background: #ccc;
+}
+
+.btn.logout {
+  background: #ff8f00;
+  color: white;
+}

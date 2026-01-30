@@ -96,3 +96,60 @@
     padding: 1rem;
   }
 }
+
+
+
+/* ======== Logout Button ======== */
+.logout-btn {
+  width: 100%;
+  margin-top: auto;
+  padding: 0.8rem 1rem;
+  background: transparent;          /* same as links */
+  color: #3e2723;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* 🔥 ORANGE HOVER EFFECT */
+.logout-btn:hover {
+  background: #ff8f00;              /* same as link hover */
+  color: #fff8e1;
+}
+
+/* optional: focus */
+.logout-btn:focus {
+  outline: none;
+}
+
+/* ======== Mobile ======== */
+@media (max-width: 900px) {
+  .logout-btn {
+    width: auto;
+    margin-top: 0;
+    margin-left: auto;
+    padding: 0.6rem 0.9rem;
+  }
+}
+
+.sidenav {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;   /* 🔥 without this logout neeche nahi dikhega */
+}
+
+.sidenav-top {
+  flex: 1;
+}
+
+/* .sidenav-bottom {
+  margin-top: auto;
+} */
+
+
+
+

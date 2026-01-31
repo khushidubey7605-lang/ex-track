@@ -1,0 +1,58 @@
+.profile-card {
+  max-width: 400px;
+  margin: 4rem auto;
+  padding: 2rem;
+  background: linear-gradient(145deg, #fff8e1, #ffe0b2);
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #3e2723;
+  transition: transform 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-5px);
+}
+
+.profile-header h2 {
+  margin: 0;
+  color: #ff6f00;
+  font-size: 1.5rem;
+}
+
+.user-id {
+  font-size: 0.85rem;
+  color: #6d4c41;
+  margin-bottom: 1.5rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  transition: background 0.3s ease;
+}
+
+.row:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+}
+
+.info label {
+  display: block;
+  font-weight: 600;
+  color: #ff8f00;
+}
+
+.info p {
+  margin: 2px 0 0;
+  font-size: 0.95rem;
+  color: #3e2723;
+}

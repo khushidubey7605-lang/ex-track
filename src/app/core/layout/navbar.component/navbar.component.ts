@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -13,4 +14,19 @@ export class NavbarComponent {
 
   @Input() username: string | null = null;
 
+  isLogoutActive = false;
+
+  constructor(private authService: AuthService) {}
+
+  logout() {
+    this.isLogoutActive = true;
+
+    const confirmLogout = window.confirm('Are you sure you want to logout?');
+
+    if (confirmLogout) {
+      this.authService.logout();
+    } else {
+      this.isLogoutActive = false;
+    }
+  }
 }

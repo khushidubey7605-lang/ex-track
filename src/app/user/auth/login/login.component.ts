@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../services/auth.service';
+import { AuthService, CurrentUser } from '../../../services/auth';
 
 @Component({
   selector: 'app-login',
@@ -25,10 +25,11 @@ export class LoginComponent {
   async login(form: NgForm) {
     this.submitted = true;
 
+    // stop if form invalid
     if (!form.valid) return;
 
     try {
-      const userData = await this.auth.login(this.email, this.password);
+      const userData: CurrentUser = await this.auth.login(this.email, this.password);
 
       // Role-based redirect
       if (userData.role === 'user') {
@@ -44,17 +45,22 @@ export class LoginComponent {
       }
 
     } catch (err: any) {
-      // Firebase friendly errors
-      if (err.code === 'auth/user-not-found') {
-        alert('User not found. Please signup first.');
-      } else if (err.code === 'auth/wrong-password') {
-        alert('Incorrect password.');
-      } else if (err.code === 'auth/invalid-credential') {
-        alert('Invalid email or password.');
-      } else if (err.code === 'auth/too-many-requests') {
-        alert('Too many attempts. Try again later.');
-      } else {
-        alert(err.message || 'Login failed');
+      // Firebase auth errors handling
+      switch (err.code) {
+        case 'auth/user-not-found':
+          alert('User not found. Please signup first.');
+          break;
+        case 'auth/wrong-password':
+          alert('Incorrect password.');
+          break;
+        case 'auth/invalid-credential':
+          alert('Invalid email or password.');
+          break;
+        case 'auth/too-many-requests':
+          alert('Too many attempts. Try again later.');
+          break;
+        default:
+          alert(err.message || 'Login failed');
       }
     }
   }

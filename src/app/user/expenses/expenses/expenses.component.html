@@ -6,7 +6,7 @@
     <h2>{{ editingId ? 'Edit Expense' : 'Add Expense' }}</h2>
 
     <!-- Expense Form -->
-    <form class="expense-form" (ngSubmit)="save()">
+    <form class="expense-form" (ngSubmit)="save(expenseForm)" #expenseForm="ngForm">
 
       <div class="form-group">
         <label>Title</label>

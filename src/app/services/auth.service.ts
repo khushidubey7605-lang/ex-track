@@ -1,12 +1,19 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User, onAuthStateChanged } from '@angular/fire/auth';
+import {
+  Auth as FirebaseAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  User,
+  onAuthStateChanged
+} from '@angular/fire/auth';
 import { Firestore, doc, setDoc, getDoc, serverTimestamp } from '@angular/fire/firestore';
 
 export interface CurrentUser {
   uid: string;
   name: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'superadmin';
   status: 'active' | 'pending';
   phone?: string;
   city?: string;
@@ -17,15 +24,24 @@ export interface CurrentUser {
 export class AuthService {
   private currentUser: CurrentUser | null = null;
 
-  public userChanges: BehaviorSubject<CurrentUser | null> = new BehaviorSubject<CurrentUser | null>(null);
+  public userChanges: BehaviorSubject<CurrentUser | null> =
+    new BehaviorSubject<CurrentUser | null>(null);
 
-  constructor(private auth: Auth, private firestore: Firestore) {
+  constructor(private auth: FirebaseAuth, private firestore: Firestore) {
     onAuthStateChanged(this.auth, async (user: User | null) => {
       if (user) {
         const snap = await getDoc(doc(this.firestore, 'users', user.uid));
         if (snap.exists()) {
           const d: any = snap.data();
-          this.currentUser = { uid: d.uid, name: d.name, role: d.role, status: d.status, phone: d.phone, city: d.city, gender: d.gender };
+          this.currentUser = {
+            uid: user.uid,
+            name: d.name,
+            role: d.role,
+            status: d.status,
+            phone: d.phone,
+            city: d.city,
+            gender: d.gender
+          };
           this.userChanges.next(this.currentUser);
         }
       } else {
@@ -35,27 +51,67 @@ export class AuthService {
     });
   }
 
-  getCurrentUser(): CurrentUser | null { return this.currentUser; }
-  getUsername(): string | null { return this.currentUser?.name || null; }
+  getCurrentUser(): CurrentUser | null {
+    return this.currentUser;
+  }
 
-  async register(name: string, email: string, password: string, role: 'user' | 'admin', extraData?: { phone?: string; city?: string; gender?: string }) {
+  getUsername(): string | null {
+    return this.currentUser?.name || null;
+  }
+
+  async register(
+    name: string,
+    email: string,
+    password: string,
+    role: 'user' | 'admin' | 'superadmin',
+    extraData?: { phone?: string; city?: string; gender?: string }
+  ): Promise<User> {
     const res = await createUserWithEmailAndPassword(this.auth, email, password);
     const uid = res.user.uid;
     const status = role === 'admin' ? 'pending' : 'active';
-    await setDoc(doc(this.firestore, 'users', uid), { uid, name, email, role, status, phone: extraData?.phone || '', city: extraData?.city || '', gender: extraData?.gender || '', createdAt: serverTimestamp() });
+    await setDoc(doc(this.firestore, 'users', uid), {
+      uid,
+      name,
+      email,
+      role,
+      status,
+      phone: extraData?.phone || '',
+      city: extraData?.city || '',
+      gender: extraData?.gender || '',
+      createdAt: serverTimestamp()
+    });
     return res.user;
   }
 
   async login(email: string, password: string): Promise<CurrentUser> {
     const res = await signInWithEmailAndPassword(this.auth, email, password);
     const snap = await getDoc(doc(this.firestore, 'users', res.user.uid));
-    if (!snap.exists()) { await signOut(this.auth); throw new Error('User data not found'); }
+    if (!snap.exists()) {
+      await signOut(this.auth);
+      throw new Error('User data not found');
+    }
     const d: any = snap.data();
-    if (d.role === 'admin' && d.status !== 'active') { await signOut(this.auth); throw new Error('Admin approval pending'); }
-    this.currentUser = { uid: d.uid, name: d.name, role: d.role, status: d.status, phone: d.phone, city: d.city, gender: d.gender };
+    if (d.role === 'admin' && d.status !== 'active') {
+      await signOut(this.auth);
+      throw new Error('Admin approval pending');
+    }
+
+    this.currentUser = {
+      uid: res.user.uid,
+      name: d.name,
+      role: d.role,
+      status: d.status,
+      phone: d.phone,
+      city: d.city,
+      gender: d.gender
+    };
     this.userChanges.next(this.currentUser);
     return this.currentUser;
   }
 
-  async logout() { await signOut(this.auth); this.currentUser = null; this.userChanges.next(null); }
+  async logout() {
+    await signOut(this.auth);
+    this.currentUser = null;
+    this.userChanges.next(null);
+  }
 }

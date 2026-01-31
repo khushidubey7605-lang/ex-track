@@ -1,61 +1,67 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { IncomeService } from '../../services/income.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormsModule } from '@angular/forms';       // ✅ ngModel, ngForm
+import { CommonModule } from '@angular/common';     // ✅ *ngFor, *ngIf
 
+import { TransactionService } from '../../services/transaction.service';
+import { Transaction } from '../../models/transaction.model';
 
 @Component({
-  standalone: true,
-  imports: [CommonModule, FormsModule],
   selector: 'app-income',
+  standalone: true,          // ✅ make it standalone
+  imports: [FormsModule, CommonModule],  // ✅ modules for template
   templateUrl: './income.component.html',
   styleUrls: ['./income.component.css']
 })
-export class IncomeComponent {
+export class IncomeComponent implements OnInit, OnDestroy {
 
-  // Form model
-  data = {
+  transactions: Transaction[] = [];
+  data: Transaction = {
     title: '',
     amount: 0,
     category: '',
-    date: ''
+    date: '',
+    userId: '',
+    type: 'income'
   };
+  unsubscribe!: () => void;
+  userId = 'USER_ID_HERE'; // replace with actual user ID
 
-  // List of incomes
-  incomeList: any[] = [];
+  constructor(private transactionService: TransactionService) {}
 
-  constructor(private service: IncomeService) {
-    this.loadIncomes();
+  ngOnInit(): void {
+    // Real-time listener for user's income
+    this.unsubscribe = this.transactionService.listenUserTransactions(
+      this.userId,
+      (list: Transaction[]) => {
+        this.transactions = list.filter(t => t.type === 'income');
+      }
+    );
   }
 
-  // Save new income
-  async save() {
-    const d = new Date(this.data.date);
-    await this.service.addIncome({
-      ...this.data,
-      month: d.getMonth() + 1,
-      year: d.getFullYear()
-    });
-
-    alert('Income Added');
-    this.data = { title: '', amount: 0, category: '', date: '' }; // reset form
-    this.loadIncomes(); // reload list
+  ngOnDestroy(): void {
+    if (this.unsubscribe) this.unsubscribe();
   }
 
-  // Load all incomes
-  async loadIncomes() {
-    this.incomeList = await this.service.getIncomes(); // Make sure getIncomes() returns Promise<any[]>
+  save(): void {
+    const transaction: Transaction = { ...this.data, userId: this.userId, type: 'income' };
+    this.transactionService.addTransaction(transaction);
+
+    // Reset form
+    this.data = {
+      title: '',
+      amount: 0,
+      category: '',
+      date: '',
+      userId: '',
+      type: 'income'
+    };
   }
 
-  // Edit an income
-  editIncome(item: any) {
-    this.data = { ...item }; // load item into form for editing
+  editIncome(item: Transaction): void {
+    this.data = { ...item };
   }
 
-  // Delete an income
-  async deleteIncome(item: any) {
-    await this.service.deleteIncome(item.id); // Make sure deleteIncome accepts ID
-    alert('Income Deleted');
-    this.loadIncomes(); // refresh list
+  deleteIncome(item: Transaction): void {
+    if (item.id) this.transactionService.deleteTransaction(item.id);
   }
 }

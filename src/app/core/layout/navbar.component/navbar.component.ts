@@ -14,22 +14,19 @@ export class NavbarComponent {
 
   @Input() username: string | null = null;
 
-  isLogoutActive = false; // 🔥 NEW FLAG
+  isLogoutActive = false;
 
   constructor(private authService: AuthService) {}
 
-//  isLogoutActive = false;
+  logout() {
+    this.isLogoutActive = true;
 
-logout() {
-  this.isLogoutActive = true;
+    const confirmLogout = window.confirm('Are you sure you want to logout?');
 
-  const confirmLogout = window.confirm('Are you sure you want to logout?');
-
-  if (confirmLogout) {
-    this.authService.logout();
-  } else {
-    this.isLogoutActive = false;
+    if (confirmLogout) {
+      this.authService.logout();
+    } else {
+      this.isLogoutActive = false;
+    }
   }
-}
-
 }

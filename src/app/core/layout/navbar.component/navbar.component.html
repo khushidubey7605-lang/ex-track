@@ -3,11 +3,16 @@
 
     <!-- TOP -->
     <div class="sidenav-top">
+
+      <!-- LOGO -->
       <div class="sidenav-logo">
-        <h1>ExpenseTracker</h1>
-        <p *ngIf="username">Welcome, {{ username }}</p>
+        <div class="logo-circle">
+          {{ username?.charAt(0)?.toUpperCase() || 'U' }}
+        </div>
+        <span class="logo-text">ExpenseTracker</span>
       </div>
 
+      <!-- LINKS -->
       <ul class="sidenav-links">
         <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
         <li><a routerLink="/expenses" routerLinkActive="active">Expenses</a></li>
@@ -15,14 +20,16 @@
         <li><a routerLink="/reports" routerLinkActive="active">Reports</a></li>
         <li><a routerLink="/profile" routerLinkActive="active">Profile</a></li>
       </ul>
+
     </div>
 
     <!-- BOTTOM -->
-    <ul class="sidenav-links">
-      <li>
-        <a class="logout-link" routerLink="/logout">Logout</a>
-      </li>
-    </ul>
+    <button
+      class="logout-btn"
+      [class.active]="isLogoutActive"
+      (click)="logout()">
+      Logout
+    </button>
 
   </nav>
 </div>

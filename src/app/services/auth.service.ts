@@ -29,10 +29,10 @@ export interface CurrentUser {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+
   private currentUser: CurrentUser | null = null;
 
-  public userChanges: BehaviorSubject<CurrentUser | null> =
-    new BehaviorSubject<CurrentUser | null>(null);
+  public userChanges = new BehaviorSubject<CurrentUser | null>(null);
 
   constructor(
     private auth: Auth,
@@ -41,7 +41,10 @@ export class AuthService {
   ) {
     onAuthStateChanged(this.auth, async (user: User | null) => {
       if (user) {
-        const snap = await getDoc(doc(this.firestore, 'users', user.uid));
+        const snap = await getDoc(
+          doc(this.firestore, 'users', user.uid)
+        );
+
         if (snap.exists()) {
           const d: any = snap.data();
           this.currentUser = {
@@ -62,12 +65,12 @@ export class AuthService {
     });
   }
 
-  // 🔹 Get current user object
+  // ✅ READ-ONLY USER (logo click ke liye)
   getCurrentUser(): CurrentUser | null {
     return this.currentUser;
   }
 
-  // 🔹 Get username only
+  // ✅ Username only (navbar ke liye)
   getUsername(): string | null {
     return this.currentUser?.name || null;
   }
@@ -142,14 +145,11 @@ export class AuthService {
     return this.currentUser;
   }
 
-  // 🔴 LOGOUT (UPDATED)
+  // 🔴 Logout
   async logout() {
     await signOut(this.auth);
     this.currentUser = null;
     this.userChanges.next(null);
-
-    // 🔁 Redirect after logout
-    this.router.navigate(['/register']); 
-    // agar login page hai to '/login'
+    this.router.navigate(['/register']); // ya /login
   }
 }

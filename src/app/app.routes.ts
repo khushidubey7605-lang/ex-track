@@ -25,8 +25,14 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent },
   { path: 'income', component: IncomeComponent },
   { path: 'logout', component: LogoutComponent },
+  {
+  path: 'profile-view',
+  loadComponent: () =>
+    import('./user/profile-view.component/profile-view.component')
+      .then(m => m.ProfileViewComponent)
+},
   { path: '**', redirectTo: 'register' }
-];
 
 
+]
    

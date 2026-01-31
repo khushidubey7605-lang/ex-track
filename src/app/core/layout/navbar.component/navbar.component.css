@@ -90,3 +90,6 @@
   background: #ff8f00;
   color: #fff8e1;
 }
+.clickable {
+  cursor: pointer;
+}

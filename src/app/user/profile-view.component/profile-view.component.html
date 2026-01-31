@@ -1,0 +1,46 @@
+<div class="profile-card" *ngIf="user">
+  <div class="profile-header">
+    <h2>User Details</h2>
+    <!-- <p class="user-id">ID: {{ user.uid }}</p> -->
+  </div>
+
+  <div class="row">
+    <i class="icon">👤</i>
+    <div class="info">
+      <label>Name</label>
+      <p>{{ user.name }}</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <i class="icon">🏙️</i>
+    <div class="info">
+      <label>City</label>
+      <p>{{ user.city }}</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <i class="icon">📞</i>
+    <div class="info">
+      <label>Phone Number</label>
+      <p>{{ user.phone }}</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <i class="icon">⚧</i>
+    <div class="info">
+      <label>Gender</label>
+      <p>{{ user.gender }}</p>
+    </div>
+  </div>
+
+  <!-- <div class="row">
+    <i class="icon">✉️</i>
+    <div class="info">
+      <label>Email</label>
+      <p>{{ user.email }}</p>
+    </div> 
+  </div>-->
+</div>

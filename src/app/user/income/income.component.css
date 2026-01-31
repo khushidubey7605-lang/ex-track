@@ -1,153 +1,148 @@
-/* ===== Wrapper Panel ===== */
-.income-wrapper {
-  max-width: 700px;
-  margin: 20px auto;
-  padding: 25px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 3px 15px rgba(0,0,0,0.1);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* ===============================
+   Host Fix (Angular)
+=============================== */
+:host {
+  display: block;
+  width: 100%;
 }
 
-/* ===== Headings ===== */
-.income-wrapper h3 {
+/* ===============================
+   Wrapper
+=============================== */
+.income-wrapper {
+  max-width: 720px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* ===============================
+   Form
+=============================== */
+.income-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.income-form input {
+  padding: 12px 14px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.income-form input:focus {
+  outline: none;
+  border-color: #ff9800;
+  background: #fff8f0;
+}
+
+/* ===============================
+   Submit Button
+=============================== */
+.income-form button {
+  grid-column: span 2;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #ff9800;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.income-form button:hover {
+  background: #fb8c00;
+}
+
+/* ===============================
+   Divider
+=============================== */
+hr {
+  margin: 28px 0;
+  border: none;
+  height: 1px;
+  background: #eee;
+}
+
+/* ===============================
+   Empty Text
+=============================== */
+.income-wrapper > div {
   text-align: center;
-  margin-bottom: 20px;
+  color: #777;
+  font-size: 14px;
+}
+
+/* ===============================
+   Income Items
+=============================== */
+.income-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  background: #fff7ed;
+  border-radius: 10px;
+  border-left: 5px solid #ff9800;
+}
+
+.income-item strong {
+  font-size: 15px;
   color: #333;
 }
 
-/* ===== Form Styling ===== */
-.income-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-bottom: 25px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group label {
-  margin-bottom: 5px;
-  font-weight: 500;
+.income-item span {
+  font-size: 14px;
   color: #555;
 }
 
-.form-group input {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  outline: none;
-  transition: 0.3s;
-}
-
-.form-group input:focus {
-  border-color: #28a745;
-  box-shadow: 0 0 5px rgba(40,167,69,0.2);
-}
-
-/* ===== Submit Button ===== */
-button[type="submit"] {
-  padding: 12px;
-  background-color: #28a745;
-  color: white;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button[type="submit"]:hover {
-  background-color: #218838;
-}
-
-button[type="submit"]:disabled {
-  background-color: #90ee90;
-  cursor: not-allowed;
-}
-
-/* ===== Income List ===== */
-.income-list {
-  margin-top: 20px;
-}
-
-.income-list div {
-  font-size: 14px;
-  color: #666;
-}
-
-/* ===== Income Item ===== */
-.income-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 15px;
-  border: 1px solid #eee;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  background-color: #f8f9fa;
-  transition: 0.3s;
-}
-
-.income-item:hover {
-  background-color: #e9f7ef;
-}
-
-/* ===== Actions (Edit/Delete) ===== */
-.income-actions {
-  display: flex;
-  gap: 10px;
-}
-
-/* Amount Highlight */
-.income-amount {
-  font-weight: bold;
-  color: #28a745;
-  margin-right: 10px;
-}
-
-/* Edit Button */
-.edit-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 6px 12px;
+/* ===============================
+   Buttons
+=============================== */
+.income-item button {
+  padding: 6px 10px;
+  font-size: 13px;
   border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.edit-btn:hover {
-  background-color: #0069d9;
-}
-
-/* Delete Button */
-.delete-btn {
-  background-color: #dc3545;
-  color: white;
   border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
   cursor: pointer;
-  transition: 0.3s;
 }
 
-.delete-btn:hover {
-  background-color: #c82333;
+.income-item button:first-of-type {
+  background: #ffa726;
+  color: #333;
 }
 
-/* ===== Responsive ===== */
+.income-item button:last-of-type {
+  background: #e53935;
+  color: #ffffff;
+}
+
+/* ===============================
+   Mobile Responsive
+=============================== */
 @media (max-width: 600px) {
-  .income-item {
-    flex-direction: column;
-    align-items: flex-start;
+  .income-form {
+    grid-template-columns: 1fr;
   }
 
-  .income-actions {
-    margin-top: 8px;
+  .income-form button {
+    grid-column: span 1;
+  }
+
+  .income-item {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 8px;
+  }
+
+  .income-item button {
+    width: 100%;
   }
 }

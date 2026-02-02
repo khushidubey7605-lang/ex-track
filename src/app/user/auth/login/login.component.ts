@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { AuthService, CurrentUser } from '../../../services/auth';
+import { AuthService, CurrentUser } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +20,7 @@ export class LoginComponent {
   constructor(
     private auth: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   async login(form: NgForm) {
     this.submitted = true;

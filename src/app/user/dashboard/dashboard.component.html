@@ -1,1 +1,53 @@
-<p>dashboard works!</p>
+<div class="dashboard">
+
+  <h1>Dashboard</h1>
+
+  <!-- Totals -->
+  <div class="totals">
+    <div class="card card-border-green">
+      <p class="label">Total Income</p>
+      <p class="value">₹{{ totalIncome }}</p>
+    </div>
+    <div class="card card-border-red">
+      <p class="label">Total Expense</p>
+      <p class="value">₹{{ totalExpense }}</p>
+    </div>
+    <div class="card card-border-blue">
+      <p class="label">Current Balance</p>
+      <p class="value">₹{{ balance }}</p>
+    </div>
+  </div>
+
+  <!-- Chart & Recent Activity -->
+  <div class="grid-2">
+    <!-- Income vs Expense Pie Chart -->
+    <div class="card">
+      <h2>Income vs Expense</h2>
+      <canvas baseChart
+        [data]="pieChartData"
+        [type]="pieChartType"
+        [options]="pieChartOptions">
+      </canvas>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="card">
+      <h2>Recent Activity</h2>
+      <div *ngIf="transactions.length === 0" style="color: #9ca3af;">
+        No transactions found.
+      </div>
+      <ul *ngIf="transactions.length > 0" class="transactions">
+        <li *ngFor="let t of transactions | slice:0:5">
+          <div>
+            <p class="title">{{ t.title }}</p>
+            <p class="details">{{ t.date | date:'shortDate' }} • {{ t.category }}</p>
+          </div>
+          <div [ngClass]="{'amount-income': t.type === 'income', 'amount-expense': t.type === 'expense'}">
+            ₹{{ t.amount }}
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</div>

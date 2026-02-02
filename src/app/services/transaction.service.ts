@@ -1,5 +1,4 @@
-// src/app/services/transaction.service.ts
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -8,48 +7,43 @@ import {
   where,
   onSnapshot,
   deleteDoc,
-  doc,
-  DocumentData
+  doc
 } from '@angular/fire/firestore';
-import { Transaction } from '../models/transaction.model'; // ✅ make sure this file exists
+import { Observable } from 'rxjs';
+import { Transaction } from '../models/transaction.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TransactionService {
+  private firestore = inject(Firestore);
 
-  constructor(private firestore: Firestore) {}
+  // Listen to user's transactions as Observable
+  listenUserTransactions(userId: string): Observable<Transaction[]> {
+    return new Observable<Transaction[]>(observer => {
+      const q = query(
+        collection(this.firestore, 'transactions'),
+        where('userId', '==', userId)
+      );
 
-  // Add a new transaction
-  addTransaction(data: Transaction) {
-    return addDoc(
-      collection(this.firestore, 'transactions'),
-      data as DocumentData
-    );
-  }
+      const unsubscribe = onSnapshot(q, (snap) => {
+        const list: Transaction[] = snap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as Transaction)
+        }));
+        observer.next(list);
+      });
 
-  // Listen to transactions of a specific user in real-time
-  listenUserTransactions(
-    userId: string,
-    cb: (list: Transaction[]) => void
-  ): () => void {
-
-    const q = query(
-      collection(this.firestore, 'transactions'),
-      where('userId', '==', userId)
-    );
-
-    return onSnapshot(q, snap => {
-      const list: Transaction[] = snap.docs.map(d => ({
-        id: d.id,
-        ...(d.data() as Transaction)
-      }));
-      cb(list);
+      // Cleanup on unsubscribe
+      return () => unsubscribe();
     });
   }
 
-  // Delete a transaction by ID
-  deleteTransaction(id: string) {
+  addTransaction(data: Transaction): Promise<any> {
+    return addDoc(collection(this.firestore, 'transactions'), data);
+  }
+
+  deleteTransaction(id: string): Promise<void> {
     return deleteDoc(doc(this.firestore, 'transactions', id));
   }
 }

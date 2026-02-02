@@ -1,12 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import { TransactionService } from '../../services/transaction.service';
 import { AuthService, CurrentUser } from '../../services/auth.service';
 import { Transaction } from '../../models/transaction.model';
-
 
 @Component({
   selector: 'app-income',
@@ -29,7 +28,7 @@ export class IncomeComponent implements OnInit, OnDestroy {
   };
 
   private authSub!: Subscription;
-  private txUnsub!: () => void;
+  private txSub!: Subscription;
 
   constructor(
     private authService: AuthService,
@@ -37,31 +36,25 @@ export class IncomeComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // ✅ Listen logged-in user
-    this.authSub = this.authService.userChanges.subscribe(
-      (user: CurrentUser | null) => {
-        if (!user) return;
+    this.authSub = this.authService.userChanges.subscribe((user: CurrentUser | null) => {
+      if (!user) return;
 
-        this.userId = user.uid;
+      this.userId = user.uid;
 
-        // ✅ Start Firestore listener after UID
-        this.txUnsub = this.transactionService.listenUserTransactions(
-          this.userId,
-          list => {
-            this.income = list.filter(t => t.type === 'income');
-          }
-        );
-      }
-    );
+      this.txSub = this.transactionService.listenUserTransactions(this.userId)
+        .subscribe((list: Transaction[]) => {
+          this.income = list.filter((t: Transaction) => t.type === 'income');
+        });
+    });
   }
 
   ngOnDestroy(): void {
     if (this.authSub) this.authSub.unsubscribe();
-    if (this.txUnsub) this.txUnsub();
+    if (this.txSub) this.txSub.unsubscribe();
   }
 
-  save(form: any): void {
-    if (form.invalid) return;
+  save(form: NgForm): void {
+    if (form.invalid || !this.userId) return;
 
     const dateObj = new Date(this.data.date);
 
@@ -76,10 +69,12 @@ export class IncomeComponent implements OnInit, OnDestroy {
       type: 'income'
     };
 
-    this.transactionService.addTransaction(tx).then(() => {
-      form.resetForm();
-      this.editingId = null;
-    });
+    this.transactionService.addTransaction(tx)
+      .then(() => {
+        form.resetForm();
+        this.editingId = null;
+        this.income = [...this.income, tx]; // instant update
+      });
   }
 
   edit(item: Transaction): void {
@@ -93,6 +88,9 @@ export class IncomeComponent implements OnInit, OnDestroy {
   }
 
   delete(id: string): void {
-    this.transactionService.deleteTransaction(id);
+    this.transactionService.deleteTransaction(id)
+      .then(() => {
+        this.income = this.income.filter(i => i.id !== id);
+      });
   }
 }

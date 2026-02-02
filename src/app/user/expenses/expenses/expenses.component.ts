@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import { TransactionService } from '../../../services/transaction.service';
@@ -28,39 +28,33 @@ export class ExpensesComponent implements OnInit, OnDestroy {
   };
 
   private authSub!: Subscription;
-  private txUnsub!: () => void;
+  private txSub!: Subscription;
 
   constructor(
     private authService: AuthService,
     private transactionService: TransactionService
   ) {}
 
-  ngOnInit() {
-    // ✅ Listen to logged-in user
-    this.authSub = this.authService.userChanges.subscribe(
-      (user: CurrentUser | null) => {
-        if (!user) return;
+  ngOnInit(): void {
+    this.authSub = this.authService.userChanges.subscribe((user: CurrentUser | null) => {
+      if (!user) return;
 
-        this.userId = user.uid;
+      this.userId = user.uid;
 
-        // ✅ Start Firestore listener only after UID is ready
-        this.txUnsub = this.transactionService.listenUserTransactions(
-          this.userId,
-          list => {
-            this.expenses = list.filter(t => t.type === 'expense');
-          }
-        );
-      }
-    );
+      this.txSub = this.transactionService.listenUserTransactions(this.userId)
+        .subscribe((list: Transaction[]) => {
+          this.expenses = list.filter((t: Transaction) => t.type === 'expense');
+        });
+    });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.authSub) this.authSub.unsubscribe();
-    if (this.txUnsub) this.txUnsub();
+    if (this.txSub) this.txSub.unsubscribe();
   }
 
-  save(form: any) {
-    if (form.invalid) return;
+  save(form: NgForm): void {
+    if (form.invalid || !this.userId) return;
 
     const dateObj = new Date(this.data.date);
 
@@ -75,13 +69,15 @@ export class ExpensesComponent implements OnInit, OnDestroy {
       type: 'expense'
     };
 
-    this.transactionService.addTransaction(tx).then(() => {
-      form.resetForm();
-      this.editingId = null;
-    });
+    this.transactionService.addTransaction(tx)
+      .then(() => {
+        form.resetForm();
+        this.editingId = null;
+        this.expenses = [...this.expenses, tx]; // instant update
+      });
   }
 
-  edit(item: Transaction) {
+  edit(item: Transaction): void {
     this.editingId = item.id!;
     this.data = {
       title: item.title,
@@ -91,7 +87,10 @@ export class ExpensesComponent implements OnInit, OnDestroy {
     };
   }
 
-  delete(id: string) {
-    this.transactionService.deleteTransaction(id);
+  delete(id: string): void {
+    this.transactionService.deleteTransaction(id)
+      .then(() => {
+        this.expenses = this.expenses.filter(e => e.id !== id);
+      });
   }
 }

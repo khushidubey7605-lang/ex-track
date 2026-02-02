@@ -3,6 +3,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { ProfileService } from '../../../services/profile.service';
 
 @Component({
   selector: 'app-login',
@@ -19,32 +20,40 @@ export class LoginComponent {
 
   constructor(
     private auth: AuthService,
+    private profileService: ProfileService,
     private router: Router
   ) {}
 
   async login(form: NgForm) {
     this.submitted = true;
-
     if (!form.valid) return;
 
     try {
-      const userData = await this.auth.login(this.email, this.password);
+      // 🔐 Firebase Auth
+      const authUser = await this.auth.login(this.email, this.password);
 
-      // Role-based redirect
-      if (userData.role === 'user') {
+      // 🔥 Firestore se REAL updated profile
+      const profile: any = await this.profileService.getProfile();
+
+      // ✅ LocalStorage sirf cache ke liye
+      localStorage.setItem('currentUser', JSON.stringify(profile));
+
+      // ✅ Role-based redirect
+      if (profile.role === 'user') {
         this.router.navigate(['/dashboard']);
-      } else if (userData.role === 'admin') {
-        if (userData.status === 'active') {
+      } 
+      else if (profile.role === 'admin') {
+        if (profile.status === 'active') {
           this.router.navigate(['/admin-dashboard']);
         } else {
           alert('Admin approval pending!');
         }
-      } else if (userData.role === 'superadmin') {
+      } 
+      else if (profile.role === 'superadmin') {
         this.router.navigate(['/superadmin-dashboard']);
       }
 
     } catch (err: any) {
-      // Firebase friendly errors
       if (err.code === 'auth/user-not-found') {
         alert('User not found. Please signup first.');
       } else if (err.code === 'auth/wrong-password') {

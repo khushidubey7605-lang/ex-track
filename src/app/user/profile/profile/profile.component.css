@@ -1,0 +1,59 @@
+.profile-container {
+  max-width: 500px;
+  background: #fff3e0;
+  padding: 25px;
+  border-radius: 10px;
+}
+
+h2 {
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+input:disabled {
+  background-color: #eaeaea;
+  cursor: not-allowed;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #ff9800;
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #ccc;
+}
+
+.success {
+  margin-top: 10px;
+  color: green;
+  font-weight: 600;
+}

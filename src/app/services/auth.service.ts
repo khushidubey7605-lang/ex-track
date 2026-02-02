@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import {
   Auth,
@@ -20,6 +20,7 @@ import { Router } from '@angular/router';
 export interface CurrentUser {
   uid: string;
   name: string;
+  email: string;
   role: 'user' | 'admin';
   status: 'active' | 'pending';
   phone?: string;
@@ -31,51 +32,55 @@ export interface CurrentUser {
 export class AuthService {
 
   private currentUser: CurrentUser | null = null;
-
-  public userChanges = new BehaviorSubject<CurrentUser | null>(null);
+  userChanges = new BehaviorSubject<CurrentUser | null>(null);
 
   constructor(
     private auth: Auth,
     private firestore: Firestore,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone
   ) {
-    onAuthStateChanged(this.auth, async (user: User | null) => {
-      if (user) {
+    onAuthStateChanged(this.auth, (user: User | null) => {
+      this.ngZone.run(async () => {
+
+        if (!user) {
+          this.currentUser = null;
+          this.userChanges.next(null);
+          return;
+        }
+
         const snap = await getDoc(
           doc(this.firestore, 'users', user.uid)
         );
 
-        if (snap.exists()) {
-          const d: any = snap.data();
-          this.currentUser = {
-            uid: d.uid,
-            name: d.name,
-            role: d.role,
-            status: d.status,
-            phone: d.phone,
-            city: d.city,
-            gender: d.gender
-          };
-          this.userChanges.next(this.currentUser);
-        }
-      } else {
-        this.currentUser = null;
-        this.userChanges.next(null);
-      }
+        if (!snap.exists()) return;
+
+        const d: any = snap.data();
+
+        this.currentUser = {
+          uid: user.uid,
+          name: d.name,
+          email: d.email,
+          role: d.role,
+          status: d.status,
+          phone: d.phone,
+          city: d.city,
+          gender: d.gender
+        };
+
+        this.userChanges.next(this.currentUser);
+      });
     });
   }
 
-  // ✅ READ-ONLY USER (logo click ke liye)
   getCurrentUser(): CurrentUser | null {
     return this.currentUser;
   }
 
-  // ✅ Username only (navbar ke liye)
   getUsername(): string | null {
     return this.currentUser?.name || null;
   }
 
-  // 🔹 Register user
   async register(
     name: string,
     email: string,
@@ -107,7 +112,6 @@ export class AuthService {
     return res.user;
   }
 
-  // 🔹 Login user
   async login(email: string, password: string): Promise<CurrentUser> {
     const res = await signInWithEmailAndPassword(
       this.auth,
@@ -132,8 +136,9 @@ export class AuthService {
     }
 
     this.currentUser = {
-      uid: d.uid,
+      uid: res.user.uid,
       name: d.name,
+      email: d.email,
       role: d.role,
       status: d.status,
       phone: d.phone,
@@ -145,11 +150,10 @@ export class AuthService {
     return this.currentUser;
   }
 
-  // 🔴 Logout
   async logout() {
     await signOut(this.auth);
     this.currentUser = null;
     this.userChanges.next(null);
-    this.router.navigate(['/register']); // ya /login
+    this.router.navigate(['/login']);
   }
 }

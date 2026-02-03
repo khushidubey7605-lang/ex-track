@@ -10,6 +10,7 @@ import { ExpensesComponent } from './user/expenses/expenses/expenses.component';
 import { ProfileComponent } from './user/profile/profile/profile.component';
 import { IncomeComponent } from './user/income/income.component'; 
 import { LogoutComponent } from './user/logout/logout.component';
+import { Reports } from './user/reports/reports/reports';
 
 
 export const routes: Routes = [
@@ -25,13 +26,14 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent },
   { path: 'income', component: IncomeComponent },
   { path: 'logout', component: LogoutComponent },
+   { path: 'report', component: Reports },
   {
   path: 'profile-view',
   loadComponent: () =>
     import('./user/profile-view.component/profile-view.component')
       .then(m => m.ProfileViewComponent)
 },
-  { path: '**', redirectTo: 'register' }
+  
 
 
 ]

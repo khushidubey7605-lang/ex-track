@@ -1,13 +1,15 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+
 import {
   Auth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  User,
-  onAuthStateChanged
+  authState,
+  User
 } from '@angular/fire/auth';
+
 import {
   Firestore,
   doc,
@@ -15,13 +17,11 @@ import {
   getDoc,
   serverTimestamp
 } from '@angular/fire/firestore';
-import { Router } from '@angular/router';
 
 export interface CurrentUser {
   uid: string;
   name: string;
-  email: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'superadmin';
   status: 'active' | 'pending';
   phone?: string;
   city?: string;
@@ -31,45 +31,40 @@ export interface CurrentUser {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
+  // ✅ Angular DI-safe injection
+  private auth = inject(Auth);
+  private firestore = inject(Firestore);
+
   private currentUser: CurrentUser | null = null;
-  userChanges = new BehaviorSubject<CurrentUser | null>(null);
 
-  constructor(
-    private auth: Auth,
-    private firestore: Firestore,
-    private router: Router,
-    private ngZone: NgZone
-  ) {
-    onAuthStateChanged(this.auth, (user: User | null) => {
-      this.ngZone.run(async () => {
+  public userChanges = new BehaviorSubject<CurrentUser | null>(null);
 
-        if (!user) {
-          this.currentUser = null;
-          this.userChanges.next(null);
-          return;
-        }
+  constructor() {
+    // ✅ AngularFire-safe auth state listener
+    authState(this.auth).subscribe(async (user: User | null) => {
+      if (!user) {
+        this.currentUser = null;
+        this.userChanges.next(null);
+        return;
+      }
 
-        const snap = await getDoc(
-          doc(this.firestore, 'users', user.uid)
-        );
+      const snap = await getDoc(
+        doc(this.firestore, 'users', user.uid)
+      );
 
-        if (!snap.exists()) return;
-
+      if (snap.exists()) {
         const d: any = snap.data();
-
         this.currentUser = {
-          uid: user.uid,
+          uid: d.uid,
           name: d.name,
-          email: d.email,
           role: d.role,
           status: d.status,
           phone: d.phone,
           city: d.city,
           gender: d.gender
         };
-
         this.userChanges.next(this.currentUser);
-      });
+      }
     });
   }
 
@@ -81,6 +76,7 @@ export class AuthService {
     return this.currentUser?.name || null;
   }
 
+  // 🔹 Register user
   async register(
     name: string,
     email: string,
@@ -112,6 +108,7 @@ export class AuthService {
     return res.user;
   }
 
+  // 🔹 Login user
   async login(email: string, password: string): Promise<CurrentUser> {
     const res = await signInWithEmailAndPassword(
       this.auth,
@@ -136,9 +133,8 @@ export class AuthService {
     }
 
     this.currentUser = {
-      uid: res.user.uid,
+      uid: d.uid,
       name: d.name,
-      email: d.email,
       role: d.role,
       status: d.status,
       phone: d.phone,
@@ -154,6 +150,5 @@ export class AuthService {
     await signOut(this.auth);
     this.currentUser = null;
     this.userChanges.next(null);
-    this.router.navigate(['/login']);
   }
 }

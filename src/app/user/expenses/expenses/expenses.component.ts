@@ -1,105 +1,96 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ExpenseService, Expense } from '../../../services/expense';
-import { AuthService } from '../../../services/auth';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
+import { TransactionService } from '../../../services/transaction.service';
+import { AuthService, CurrentUser } from '../../../services/auth.service';
+import { Transaction } from '../../../models/transaction.model';
+
 @Component({
+  selector: 'app-expenses',
   standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './expenses.component.html',
-  styleUrls: ['./expenses.component.css']
+  styleUrls: ['./expenses.component.css'],
+  imports: [CommonModule, FormsModule]
 })
 export class ExpensesComponent implements OnInit, OnDestroy {
 
-  data = { title: '', amount: null as any, category: '', date: '' };
-  expenses: Expense[] = [];
+  userId!: string;
+  expenses: Transaction[] = [];
   editingId: string | null = null;
 
-  private unsubscribeSnapshot: (() => void) | null = null;
+  data = {
+    title: '',
+    amount: 0,
+    category: '',
+    date: ''
+  };
+
+  private authSub!: Subscription;
+  private txSub!: Subscription;
 
   constructor(
-    private service: ExpenseService,
-    private auth: AuthService
+    private authService: AuthService,
+    private transactionService: TransactionService
   ) {}
 
-  ngOnInit() {
-    // Listen to auth changes (login/logout)
-    this.auth.userChanges.subscribe(user => {
-      if (this.unsubscribeSnapshot) {
-        // detach previous listener if any
-        this.unsubscribeSnapshot();
-      }
-      if (user) {
-        this.unsubscribeSnapshot = this.service.listenExpenses(user.uid, list => {
-          this.expenses = list;
+  ngOnInit(): void {
+    this.authSub = this.authService.userChanges.subscribe((user: CurrentUser | null) => {
+      if (!user) return;
+
+      this.userId = user.uid;
+
+      this.txSub = this.transactionService.listenUserTransactions(this.userId)
+        .subscribe((list: Transaction[]) => {
+          this.expenses = list.filter((t: Transaction) => t.type === 'expense');
         });
-      } else {
-        // no user logged in
-        this.expenses = [];
-      }
     });
   }
 
-  ngOnDestroy() {
-    if (this.unsubscribeSnapshot) {
-      this.unsubscribeSnapshot();
-    }
+  ngOnDestroy(): void {
+    if (this.authSub) this.authSub.unsubscribe();
+    if (this.txSub) this.txSub.unsubscribe();
   }
 
-  edit(e: Expense) {
-    this.editingId = e.id!;
-    this.data = {
-      title: e.title,
-      amount: e.amount,
-      category: e.category,
-      date: e.date
-    };
-  }
+  save(form: NgForm): void {
+    if (form.invalid || !this.userId) return;
 
-  async delete(id: string) {
-    if (!confirm('Delete this expense?')) return;
-    try {
-      await this.service.deleteExpense(id);
-    } catch (err) {
-      console.error(err);
-      alert('Failed to delete expense');
-    }
-  }
+    const dateObj = new Date(this.data.date);
 
-  async save() {
-    if (!this.data.title || !this.data.amount || !this.data.date || !this.data.category) {
-      alert('Fill all fields');
-      return;
-    }
-
-    const user = this.auth.getCurrentUser();
-    if (!user) return;
-
-    const d = new Date(this.data.date);
-
-    const payload: Expense = {
+    const tx: Transaction = {
       title: this.data.title,
       amount: Number(this.data.amount),
       category: this.data.category,
-      date: d.toISOString().split('T')[0],
-      month: d.getMonth() + 1,
-      year: d.getFullYear(),
-      userId: user.uid
+      date: this.data.date,
+      month: dateObj.getMonth() + 1,
+      year: dateObj.getFullYear(),
+      userId: this.userId,
+      type: 'expense'
     };
 
-    try {
-      if (this.editingId) {
-        await this.service.updateExpense(this.editingId, payload);
+    this.transactionService.addTransaction(tx)
+      .then(() => {
+        form.resetForm();
         this.editingId = null;
-      } else {
-        await this.service.addExpense(payload);
-      }
-      this.data = { title: '', amount: null, category: '', date: '' };
-    } catch (err) {
-      console.error(err);
-      alert('Failed to save expense');
-    }
+        this.expenses = [...this.expenses, tx]; // instant update
+      });
+  }
+
+  edit(item: Transaction): void {
+    this.editingId = item.id!;
+    this.data = {
+      title: item.title,
+      amount: item.amount,
+      category: item.category,
+      date: item.date
+    };
+  }
+
+  delete(id: string): void {
+    this.transactionService.deleteTransaction(id)
+      .then(() => {
+        this.expenses = this.expenses.filter(e => e.id !== id);
+      });
   }
 }

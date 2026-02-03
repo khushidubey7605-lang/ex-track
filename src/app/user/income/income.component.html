@@ -1,45 +1,88 @@
-<div class="income-panel">
-  <h2>Add Income</h2>
-  <form (ngSubmit)="save()" #incomeForm="ngForm" class="income-form">
+<div class="max-w-4xl mx-auto p-6">
 
-    <div class="form-row">
-      <div class="form-group">
-        <label for="title">Title</label>
-        <input type="text" id="title" name="title" [(ngModel)]="data.title" placeholder="Eg: Salary" required>
+  <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">
+      {{ editingId ? 'Edit Income' : 'Add New Income' }}
+    </h2>
+
+    <form (ngSubmit)="save(incomeForm)" #incomeForm="ngForm" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+          <input type="text" name="title" [(ngModel)]="data.title" placeholder="e.g. Salary" required
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+          <input type="number" name="amount" [(ngModel)]="data.amount" placeholder="e.g. 50000" required
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+          <input type="text" name="category" [(ngModel)]="data.category" placeholder="e.g. Job" required
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+          <input type="date" name="date" [(ngModel)]="data.date" required
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" />
+        </div>
       </div>
 
-      <div class="form-group">
-        <label for="amount">Amount</label>
-        <input type="number" id="amount" name="amount" [(ngModel)]="data.amount" placeholder="Eg: 5000" required>
+      <div class="flex justify-end pt-4">
+        <button type="submit"
+          class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow transition duration-200">
+          {{ editingId ? 'Update Income' : 'Add Income' }}
+        </button>
       </div>
+    </form>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Recent Income</h3>
+
+    <div *ngIf="income.length === 0" class="text-center py-8 text-gray-500">
+      No income records found. Start by adding one!
     </div>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label for="category">Category</label>
-        <input type="text" id="category" name="category" [(ngModel)]="data.category" placeholder="Eg: Freelance / Salary" required>
-      </div>
+    <div class="space-y-3">
+      <div *ngFor="let item of income"
+        class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+        <div class="flex-1">
+          <h4 class="font-bold text-gray-800">{{ item.title }}</h4>
+          <p class="text-sm text-gray-500 flex gap-2">
+            <span>{{ item.category }}</span>
+            <span>•</span>
+            <span>{{ item.date | date }}</span>
+          </p>
+        </div>
 
-      <div class="form-group">
-        <label for="date">Date</label>
-        <input type="date" id="date" name="date" [(ngModel)]="data.date" required>
-      </div>
-    </div>
+        <div class="text-right flex items-center gap-4">
+          <span class="font-bold text-green-600 text-lg">+ ₹{{ item.amount }}</span>
 
-    <button type="submit" [disabled]="!incomeForm.form.valid">Add Income</button>
-  </form>
-
-  <h3>Income List</h3>
-  <div class="income-list">
-    <div class="income-item" *ngFor="let item of incomeList">
-      <div>
-        <strong>{{ item.title }}</strong><br>
-        <small>{{ item.category }} • {{ item.date }}</small>
-      </div>
-      <div class="income-actions">
-        <span class="income-amount">₹{{ item.amount }}</span>
-        <button class="edit-btn" (click)="editIncome(item)">Edit</button>
-        <button class="delete-btn" (click)="deleteIncome(item)">Delete</button>
+          <div class="flex gap-2">
+            <button (click)="edit(item)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition"
+              title="Edit">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+            <button (click)="delete(item.id!)" class="p-2 text-red-600 hover:bg-red-50 rounded-full transition"
+              title="Delete">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

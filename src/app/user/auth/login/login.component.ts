@@ -22,7 +22,7 @@ export class LoginComponent {
     private auth: AuthService,
     private profileService: ProfileService,
     private router: Router
-  ) {}
+  ) { }
 
   async login(form: NgForm) {
     this.submitted = true;

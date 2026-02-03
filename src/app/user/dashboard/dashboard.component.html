@@ -1,53 +1,40 @@
-<div class="dashboard">
+<div class="dashboard p-6 max-w-4xl mx-auto">
 
-  <h1>Dashboard</h1>
+  <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
 
   <!-- Totals -->
-  <div class="totals">
-    <div class="card card-border-green">
-      <p class="label">Total Income</p>
-      <p class="value">₹{{ totalIncome }}</p>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="p-4 border rounded shadow border-l-4 border-green-500">
+      <p class="text-gray-500">Total Income</p>
+      <p class="text-xl font-semibold">₹{{ totalIncome }}</p>
     </div>
-    <div class="card card-border-red">
-      <p class="label">Total Expense</p>
-      <p class="value">₹{{ totalExpense }}</p>
+    <div class="p-4 border rounded shadow border-l-4 border-red-500">
+      <p class="text-gray-500">Total Expense</p>
+      <p class="text-xl font-semibold">₹{{ totalExpense }}</p>
     </div>
-    <div class="card card-border-blue">
-      <p class="label">Current Balance</p>
-      <p class="value">₹{{ balance }}</p>
+    <div class="p-4 border rounded shadow border-l-4 border-blue-500">
+      <p class="text-gray-500">Balance</p>
+      <p class="text-xl font-semibold">₹{{ totalIncome - totalExpense }}</p>
     </div>
   </div>
 
-  <!-- Chart & Recent Activity -->
-  <div class="grid-2">
-    <!-- Income vs Expense Pie Chart -->
-    <div class="card">
-      <h2>Income vs Expense</h2>
-      <canvas baseChart
-        [data]="pieChartData"
-        [type]="pieChartType"
-        [options]="pieChartOptions">
-      </canvas>
-    </div>
-
-    <!-- Recent Transactions -->
-    <div class="card">
-      <h2>Recent Activity</h2>
-      <div *ngIf="transactions.length === 0" style="color: #9ca3af;">
-        No transactions found.
-      </div>
-      <ul *ngIf="transactions.length > 0" class="transactions">
-        <li *ngFor="let t of transactions | slice:0:5">
-          <div>
-            <p class="title">{{ t.title }}</p>
-            <p class="details">{{ t.date | date:'shortDate' }} • {{ t.category }}</p>
-          </div>
-          <div [ngClass]="{'amount-income': t.type === 'income', 'amount-expense': t.type === 'expense'}">
-            ₹{{ t.amount }}
-          </div>
-        </li>
-      </ul>
-    </div>
+  <!-- Recent Transactions -->
+  <div>
+    <h2 class="text-lg font-semibold mb-2">Recent Activity</h2>
+    <ul class="divide-y divide-gray-200">
+      <li *ngFor="let tx of transactions | slice:0:5" class="py-2 flex justify-between">
+        <div>
+          <p class="font-medium">{{ tx.title }}</p>
+          <p class="text-gray-500 text-sm">{{ tx.date | date:'short' }}</p>
+        </div>
+        <div [ngClass]="tx.type === 'income' ? 'text-green-500' : 'text-red-500'">
+          ₹{{ tx.amount }}
+        </div>
+      </li>
+      <li *ngIf="transactions.length === 0" class="py-2 text-center text-gray-400">
+        No transactions yet
+      </li>
+    </ul>
   </div>
 
 </div>

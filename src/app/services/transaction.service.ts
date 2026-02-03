@@ -10,14 +10,13 @@ import {
   where,
   onSnapshot
 } from '@angular/fire/firestore';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { Transaction } from '../models/transaction.model';
 
 @Injectable({ providedIn: 'root' })
 export class TransactionService {
   private firestore = inject(Firestore);
 
-  // Real-time store of all transactions
   private _transactions = new BehaviorSubject<Transaction[]>([]);
   transactions$ = this._transactions.asObservable();
 
@@ -25,7 +24,6 @@ export class TransactionService {
 
   // Listen to Firestore for a user
   listenUserTransactions(userId: string) {
-    // Unsubscribe previous listener if exists
     this.unsubscribe();
     
     const q = query(
@@ -36,10 +34,21 @@ export class TransactionService {
     this.unsubscribe = onSnapshot(q, snap => {
       const list: Transaction[] = snap.docs.map(d => {
         const data = d.data() as Transaction;
+
+        // ✅ Ensure date is always valid
+        let safeDate: Date;
+        if (data.date instanceof Date) safeDate = data.date;
+        else if (data.date) {
+          safeDate = new Date(data.date);
+          if (isNaN(safeDate.getTime())) safeDate = new Date();
+        } else {
+          safeDate = new Date();
+        }
+
         return {
           ...data,
           id: d.id,
-          date: data.date instanceof Date ? data.date : new Date(data.date)
+          date: safeDate
         };
       });
 
@@ -48,24 +57,18 @@ export class TransactionService {
     });
   }
 
-  // Add new transaction
+  // ✅ Add transaction without sending undefined id
   addTransaction(tx: Transaction) {
-    return addDoc(collection(this.firestore, 'transactions'), tx);
+    const { id, ...data } = tx; // remove id if exists
+    return addDoc(collection(this.firestore, 'transactions'), data);
   }
 
   // Update existing transaction
   updateTransaction(tx: Transaction) {
     if (!tx.id) return Promise.reject('Transaction ID missing');
     const docRef = doc(this.firestore, 'transactions', tx.id);
-    return updateDoc(docRef, {
-      title: tx.title,
-      amount: tx.amount,
-      category: tx.category,
-      date: tx.date,
-      month: tx.month,
-      year: tx.year,
-      type: tx.type
-    });
+    const { id, ...data } = tx;
+    return updateDoc(docRef, data);
   }
 
   // Delete transaction

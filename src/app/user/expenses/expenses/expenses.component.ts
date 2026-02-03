@@ -33,16 +33,16 @@ export class ExpensesComponent implements OnInit, OnDestroy {
       if (!user) return;
 
       this.userId = user.uid;
-
-      // Start listening to transactions
       this.transactionService.listenUserTransactions(this.userId);
 
-      // Subscribe to BehaviorSubject
       this.txSub = this.transactionService.transactions$.subscribe(list => {
-        this.expenses = list.filter(t => t.type === 'expense');
-
-        // Reset form if not editing
-        if (!this.editingId) this.data = this.getEmptyData();
+        this.expenses = list
+          .filter(t => t.type === 'expense')
+          .map(t => ({
+            ...t,
+            date: t.date instanceof Date ? t.date : new Date(t.date) // ensure Date object
+          }))
+          .sort((a, b) => b.date.getTime() - a.date.getTime());
       });
     });
   }
@@ -53,8 +53,15 @@ export class ExpensesComponent implements OnInit, OnDestroy {
     this.transactionService.stopListening();
   }
 
+  // ✅ Ensure date string for <input type="date">
   getEmptyData() {
-    return { title: '', amount: 0, category: '', date: new Date() };
+    const today = new Date();
+    return {
+      title: '',
+      amount: 0,
+      category: '',
+      date: today.toISOString().split('T')[0]
+    };
   }
 
   save(form: NgForm) {
@@ -67,24 +74,41 @@ export class ExpensesComponent implements OnInit, OnDestroy {
       month: new Date(this.data.date).getMonth() + 1,
       year: new Date(this.data.date).getFullYear(),
       userId: this.userId,
-      type: 'expense',
-      id: this.editingId ?? undefined
+      type: 'expense'
     };
 
     const action = this.editingId
-      ? this.transactionService.updateTransaction(tx)
+      ? this.transactionService.updateTransaction({ ...tx, id: this.editingId })
       : this.transactionService.addTransaction(tx);
 
-    action.then(() => {
-      form.resetForm();
-      this.editingId = null;
-      this.data = this.getEmptyData();
-    });
+    action
+      .then(() => {
+        form.resetForm();
+        this.editingId = null;
+        this.data = this.getEmptyData();
+      })
+      .catch(err => console.error('Transaction save failed:', err));
   }
 
   edit(item: Transaction) {
     this.editingId = item.id!;
-    this.data = { title: item.title, amount: item.amount, category: item.category, date: new Date(item.date) };
+
+    // ✅ Safe date conversion for editing
+    let safeDate: string;
+    if (item.date instanceof Date) safeDate = item.date.toISOString().split('T')[0];
+    else if (item.date) {
+      const d = new Date(item.date);
+      safeDate = isNaN(d.getTime()) ? new Date().toISOString().split('T')[0] : d.toISOString().split('T')[0];
+    } else {
+      safeDate = new Date().toISOString().split('T')[0];
+    }
+
+    this.data = {
+      title: item.title,
+      amount: item.amount,
+      category: item.category,
+      date: safeDate
+    };
   }
 
   cancelEdit() {
@@ -93,6 +117,11 @@ export class ExpensesComponent implements OnInit, OnDestroy {
   }
 
   delete(id: string) {
-    this.transactionService.deleteTransaction(id);
+    if (!confirm('Are you sure you want to delete this transaction?')) return;
+    this.transactionService.deleteTransaction(id)
+      .then(() => {
+        if (this.editingId === id) this.cancelEdit();
+      })
+      .catch(err => console.error('Delete failed:', err));
   }
 }

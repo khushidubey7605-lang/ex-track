@@ -1,11 +1,11 @@
 export interface Transaction {
-  id?: string;       // optional, Firestore auto-generates
+  id?: string;
   userId: string;
   title: string;
   amount: number;
   category: string;
-  date: string;      // ISO string or Firestore timestamp
+  date: Date;   // ⚡ changed from string to Date
   type: 'income' | 'expense';
-  month?: number;    // optional, calculated
-  year?: number;     // optional, calculated
+  month?: number;
+  year?: number;
 }

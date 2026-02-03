@@ -3,47 +3,78 @@ import {
   Firestore,
   collection,
   addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
   query,
   where,
-  onSnapshot,
-  deleteDoc,
-  doc
+  onSnapshot
 } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Transaction } from '../models/transaction.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class TransactionService {
   private firestore = inject(Firestore);
 
-  // Listen to user's transactions as Observable
-  listenUserTransactions(userId: string): Observable<Transaction[]> {
-    return new Observable<Transaction[]>(observer => {
-      const q = query(
-        collection(this.firestore, 'transactions'),
-        where('userId', '==', userId)
-      );
+  // Real-time store of all transactions
+  private _transactions = new BehaviorSubject<Transaction[]>([]);
+  transactions$ = this._transactions.asObservable();
 
-      const unsubscribe = onSnapshot(q, (snap) => {
-        const list: Transaction[] = snap.docs.map((d) => ({
+  private unsubscribe: () => void = () => {};
+
+  // Listen to Firestore for a user
+  listenUserTransactions(userId: string) {
+    // Unsubscribe previous listener if exists
+    this.unsubscribe();
+    
+    const q = query(
+      collection(this.firestore, 'transactions'),
+      where('userId', '==', userId)
+    );
+
+    this.unsubscribe = onSnapshot(q, snap => {
+      const list: Transaction[] = snap.docs.map(d => {
+        const data = d.data() as Transaction;
+        return {
+          ...data,
           id: d.id,
-          ...(d.data() as Transaction)
-        }));
-        observer.next(list);
+          date: data.date instanceof Date ? data.date : new Date(data.date)
+        };
       });
 
-      // Cleanup on unsubscribe
-      return () => unsubscribe();
+      // Sort by date descending
+      this._transactions.next(list.sort((a, b) => b.date.getTime() - a.date.getTime()));
     });
   }
 
-  addTransaction(data: Transaction): Promise<any> {
-    return addDoc(collection(this.firestore, 'transactions'), data);
+  // Add new transaction
+  addTransaction(tx: Transaction) {
+    return addDoc(collection(this.firestore, 'transactions'), tx);
   }
 
-  deleteTransaction(id: string): Promise<void> {
+  // Update existing transaction
+  updateTransaction(tx: Transaction) {
+    if (!tx.id) return Promise.reject('Transaction ID missing');
+    const docRef = doc(this.firestore, 'transactions', tx.id);
+    return updateDoc(docRef, {
+      title: tx.title,
+      amount: tx.amount,
+      category: tx.category,
+      date: tx.date,
+      month: tx.month,
+      year: tx.year,
+      type: tx.type
+    });
+  }
+
+  // Delete transaction
+  deleteTransaction(id: string) {
     return deleteDoc(doc(this.firestore, 'transactions', id));
+  }
+
+  // Cleanup listener
+  stopListening() {
+    this.unsubscribe();
   }
 }

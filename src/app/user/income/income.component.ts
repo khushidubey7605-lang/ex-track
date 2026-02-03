@@ -15,17 +15,10 @@ import { Transaction } from '../../models/transaction.model';
   imports: [CommonModule, FormsModule]
 })
 export class IncomeComponent implements OnInit, OnDestroy {
-
   userId!: string;
-  income: Transaction[] = [];
+  incomes: Transaction[] = [];
   editingId: string | null = null;
-
-  data = {
-    title: '',
-    amount: 0,
-    category: '',
-    date: ''
-  };
+  data = this.getEmptyData();
 
   private authSub!: Subscription;
   private txSub!: Subscription;
@@ -41,56 +34,65 @@ export class IncomeComponent implements OnInit, OnDestroy {
 
       this.userId = user.uid;
 
-      this.txSub = this.transactionService.listenUserTransactions(this.userId)
-        .subscribe((list: Transaction[]) => {
-          this.income = list.filter((t: Transaction) => t.type === 'income');
-        });
+      // Start listening to transactions
+      this.transactionService.listenUserTransactions(this.userId);
+
+      // Subscribe only to transactions$ (BehaviorSubject)
+      this.txSub = this.transactionService.transactions$.subscribe((list: Transaction[]) => {
+        this.incomes = list.filter((t: Transaction) => t.type === 'income');
+
+        // Reset form if not editing
+        if (!this.editingId) this.data = this.getEmptyData();
+      });
     });
   }
 
   ngOnDestroy(): void {
-    if (this.authSub) this.authSub.unsubscribe();
-    if (this.txSub) this.txSub.unsubscribe();
+    this.authSub?.unsubscribe();
+    this.txSub?.unsubscribe();
+    this.transactionService.stopListening();
+  }
+
+  getEmptyData() {
+    return { title: '', amount: 0, category: '', date: new Date() };
   }
 
   save(form: NgForm): void {
     if (form.invalid || !this.userId) return;
 
-    const dateObj = new Date(this.data.date);
-
     const tx: Transaction = {
-      title: this.data.title,
+      ...this.data,
       amount: Number(this.data.amount),
-      category: this.data.category,
-      date: this.data.date,
-      month: dateObj.getMonth() + 1,
-      year: dateObj.getFullYear(),
+      date: new Date(this.data.date),
+      month: new Date(this.data.date).getMonth() + 1,
+      year: new Date(this.data.date).getFullYear(),
       userId: this.userId,
-      type: 'income'
+      type: 'income',
+      id: this.editingId ?? undefined
     };
 
-    this.transactionService.addTransaction(tx)
-      .then(() => {
-        form.resetForm();
-        this.editingId = null;
-        this.income = [...this.income, tx]; // instant update
-      });
+    const action = this.editingId
+      ? this.transactionService.updateTransaction(tx)
+      : this.transactionService.addTransaction(tx);
+
+    action.then(() => {
+      form.resetForm();
+      this.editingId = null;
+      this.data = this.getEmptyData();
+    });
   }
 
   edit(item: Transaction): void {
     this.editingId = item.id!;
-    this.data = {
-      title: item.title,
-      amount: item.amount,
-      category: item.category,
-      date: item.date
-    };
+    this.data = { title: item.title, amount: item.amount, category: item.category, date: new Date(item.date) };
+  }
+
+  cancelEdit(): void {
+    this.editingId = null;
+    this.data = this.getEmptyData();
   }
 
   delete(id: string): void {
-    this.transactionService.deleteTransaction(id)
-      .then(() => {
-        this.income = this.income.filter(i => i.id !== id);
-      });
+    this.transactionService.deleteTransaction(id);
   }
 }

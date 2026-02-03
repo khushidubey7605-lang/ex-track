@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
@@ -16,7 +16,8 @@ export class NavbarComponent {
 
   isLogoutActive = false;
 
-  constructor(private authService: AuthService) {}
+  // Inject Router for redirection
+  constructor(private authService: AuthService, private router: Router) {}
 
   logout() {
     this.isLogoutActive = true;
@@ -24,7 +25,8 @@ export class NavbarComponent {
     const confirmLogout = window.confirm('Are you sure you want to logout?');
 
     if (confirmLogout) {
-      this.authService.logout();
+      this.authService.logout();         // Perform logout
+      this.router.navigate(['/register']); // Redirect to register page
     } else {
       this.isLogoutActive = false;
     }

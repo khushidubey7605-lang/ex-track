@@ -1,0 +1,17 @@
+<div class="container" #reportContent>
+  <h2>{{ reportType | titlecase }} Report</h2>
+
+  <div class="buttons">
+    <button (click)="switchReport('monthly')">Monthly</button>
+    <button (click)="switchReport('yearly')">Yearly</button>
+    <button (click)="generatePDF()">Download PDF</button>
+  </div>
+
+  <div style="display: block; width: 100%;">
+    <canvas baseChart
+            [data]="chartData"
+            [options]="chartOptions"
+            chartType="bar">
+    </canvas>
+  </div>
+</div>

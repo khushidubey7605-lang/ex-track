@@ -8,33 +8,27 @@ import { RegisterComponent } from './user/auth/register/register.component';
 import { DashboardComponent } from './user/dashboard/dashboard.component';
 import { ExpensesComponent } from './user/expenses/expenses/expenses.component';
 import { ProfileComponent } from './user/profile/profile/profile.component';
-import { IncomeComponent } from './user/income/income.component'; 
+import { IncomeComponent } from './user/income/income.component';
 import { LogoutComponent } from './user/logout/logout.component';
-import { Reports } from './user/reports/reports/reports';
-
+import { ReportsComponent } from './user/reports/reports/reports.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'register', pathMatch: 'full' },
 
-  // Auth (no navbar)
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
 
-  // User pages (with navbar)
   { path: 'dashboard', component: DashboardComponent },
   { path: 'expenses', component: ExpensesComponent },
-  { path: 'profile', component: ProfileComponent },
   { path: 'income', component: IncomeComponent },
+  { path: 'reports', component: ReportsComponent }, // ✅ FIXED
+  { path: 'profile', component: ProfileComponent },
   { path: 'logout', component: LogoutComponent },
-   { path: 'report', component: Reports },
+
   {
-  path: 'profile-view',
-  loadComponent: () =>
-    import('./user/profile-view.component/profile-view.component')
-      .then(m => m.ProfileViewComponent)
-},
-  
-
-
-]
-   
+    path: 'profile-view',
+    loadComponent: () =>
+      import('./user/profile-view.component/profile-view.component')
+        .then(m => m.ProfileViewComponent)
+  }
+];
